@@ -101,7 +101,7 @@ Update the default settings for the tool.
 
 **Usage:**
 ```bash
-python main.py settings [options]
+connor settings [options]
 ```
 
 **Options:**
@@ -111,7 +111,7 @@ python main.py settings [options]
 
 **Example:**
 ```bash
-python main.py settings --folder-name-length 3 --reading-word-limit 150 --similarity-threshold 60
+connor settings --folder-name-length 3 --reading-word-limit 150 --similarity-threshold 60
 ```
 
 ### Help
