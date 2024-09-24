@@ -3,6 +3,8 @@ import shutil
 import string
 import numpy as np
 import configparser
+import warnings
+import logging
 
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -14,15 +16,47 @@ from app.reader import read_files
 from app import data_path
 
 
-# Initializing the dependencies for the model and other functions
-model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
-stop_words = set(stopwords.words('english'))
-lemmatizer = WordNetLemmatizer()
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+warnings.filterwarnings("ignore")
 TOPICS = 100
 
-# Initializing the LDA model and Vectorizer
-lda_model = LatentDirichletAllocation(n_components=TOPICS, learning_decay=0.7, random_state=0)
-vectorizer = TfidfVectorizer(max_df=0.8, min_df=3, stop_words='english')
+def initialize_dependencies():
+    logger.info("Initializing Sentence Transformer model...")
+    try:
+        model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
+        logger.info("Sentence Transformer model downloaded successfully.")
+    except Exception as e:
+        logger.error("Error downloading Sentence Transformer model: %s", e)
+        return None, None, None, None
+
+    logger.info("Setting up NLTK stop words and lemmatizer...")
+    stop_words = set(stopwords.words('english'))
+    lemmatizer = WordNetLemmatizer()
+    logger.info("NLTK components set up successfully.")
+
+    logger.info("Initializing LDA model with %d topics...", TOPICS)
+    lda_model = LatentDirichletAllocation(n_components=TOPICS, learning_decay=0.7, random_state=0)
+    logger.info("LDA model initialized successfully.")
+
+    logger.info("Initializing TF-IDF Vectorizer...")
+    vectorizer = TfidfVectorizer(max_df=0.8, min_df=3, stop_words='english')
+    logger.info("TF-IDF Vectorizer initialized successfully.")
+
+    return model, stop_words, lemmatizer, lda_model, vectorizer
+
+# Check if initialization file exists
+if not os.path.exists(os.path.join(data_path, "init.txt")):
+    model, stop_words, lemmatizer, lda_model, vectorizer = initialize_dependencies()
+
+    with open(os.path.join(data_path, "init.txt"), 'w') as f:
+        f.write('initialized')
+else:
+    model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
+    stop_words = set(stopwords.words('english'))
+    lemmatizer = WordNetLemmatizer()
+    lda_model = LatentDirichletAllocation(n_components=TOPICS, learning_decay=0.7, random_state=0)
+    vectorizer = TfidfVectorizer(max_df=0.8, min_df=3, stop_words='english')
 
 
 # pre-processesing the text to focus on relevant content
