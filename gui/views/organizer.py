@@ -249,14 +249,9 @@ class ConnorGUI(QMainWindow):
         organize_button = QPushButton("ORGANIZE SELECTED FOLDER", parent=self.screen2)
         organize_button.setFixedSize(820, 50)
 
-        # Read-only file names checkbox
-        checkbox = QCheckBox("Read Only File Names", parent=self.screen2)
-        checkbox.setFixedSize(200, 25)
-
         inp_layout.addWidget(select_button)
         inp_layout.addWidget(self.folder_path_input)
         top_section.addLayout(inp_layout)
-        top_section.addWidget(checkbox)
 
         # selected folder label
         self.select_folder_label = QLabel(f"Your Selected Folder Before Organization:", parent=self.screen2)
@@ -272,7 +267,6 @@ class ConnorGUI(QMainWindow):
         bot_section.addWidget(self.select_folder_tab)
         bot_section.addWidget(organize_button)
 
-        checkbox.stateChanged.connect(self.file_names_checkbox_state)
         organize_button.clicked.connect(self.organize_selected_folder)
         select_button.clicked.connect(self.select_folder)
 
@@ -300,19 +294,14 @@ class ConnorGUI(QMainWindow):
         organize_button = QPushButton("ORGANIZE", parent=self.screen3)
         organize_button.setFixedSize(300, 50)
 
-        # Read-only file names checkbox
-        checkbox2 = QCheckBox("Read Only File Names", parent=self.screen3)
-        checkbox2.setFixedSize(200, 25)
-
         # copy files instead of move when user uploads files checkbox
-        checkbox3 = QCheckBox("Copy Uploaded Files", parent=self.screen3)
-        checkbox3.setFixedSize(200, 25)
+        checkbox2 = QCheckBox("Copy Uploaded Files", parent=self.screen3)
+        checkbox2.setFixedSize(200, 25)
     
         left_section.setAlignment(Qt.AlignmentFlag.AlignCenter)
         left_section.addWidget(upload_button)
         left_section.addWidget(organize_button)
         left_section.addWidget(checkbox2)
-        left_section.addWidget(checkbox3)
 
         # Uploaded files label
         self.uploaded_num_files = QLabel(f"Your Uploaded Files: <span style='color:#75a7ad;'>{self.num_files}</span>", parent=self.screen3)
@@ -347,8 +336,7 @@ class ConnorGUI(QMainWindow):
         right_section.addWidget(self.uploaded_files_tab)
         right_section.addLayout(util_layout)
 
-        checkbox2.stateChanged.connect(self.file_names_checkbox_state)
-        checkbox3.stateChanged.connect(self.copy_files_checkbox_state)
+        checkbox2.stateChanged.connect(self.copy_files_checkbox_state)
         upload_button.clicked.connect(self.upload_files)
         organize_button.clicked.connect(self.organize_uploaded_files)
         clear_button.clicked.connect(self.clear_files)
