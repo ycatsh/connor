@@ -38,26 +38,21 @@ def get_file_word_list(path, word_limit):
 
 
 # Cosine similarity calculation
-def calculate_similarity(first, rest):
-    embeddings = model.encode([first, rest], convert_to_tensor=True)
-    sim = util.cos_sim(embeddings[0], embeddings[1]).item()
-
-    return sim
+def calculate_similarity(embeddings):
+    return util.cos_sim(embeddings[0], embeddings[1]).item()
 
 
 # Files that have a similarity score over a certain threshold are grouped together
-def sim_organize(simlarity_threshold, words_list, file_names=False):
+def sim_organize(simlarity_threshold, words_list):
     grouped_files = set()
     file_groups = {}
+    embeddings = model.encode([w[1] for w in words_list], convert_to_tensor=True)
 
-    for parent_files in words_list:
+    for i, parent_files in enumerate(words_list):
         if parent_files[0] not in grouped_files:
-            for other_files in words_list:
-                if parent_files != other_files and other_files[0] not in grouped_files:
-                    if file_names:
-                        score = calculate_similarity(parent_files[0], other_files[0])
-                    else:
-                        score = calculate_similarity(parent_files[0]+parent_files[1], other_files[1])
+            for j, other_files in enumerate(words_list):
+                if i != j and other_files[0] not in grouped_files:
+                    score = calculate_similarity([embeddings[i], embeddings[j]])
 
                     if score >= simlarity_threshold: # similarity threshold decided by user (default: 50%)
                         if parent_files[0] not in file_groups:
@@ -72,29 +67,23 @@ def sim_organize(simlarity_threshold, words_list, file_names=False):
 
 
 # Generating names for the folders 
-def name_category(text_list, folder_word_limit):
-    topic_words = {}
-
+def name_category(text_list, folder_word_limit=5, delimiter="_"):
+    if not text_list:
+        return "Untitled"
+    
     text_vectorized = vectorizer.transform(text_list)
     topic_distribution = lda_model.transform(text_vectorized)
+    dominant_topic_index = np.argmax(topic_distribution, axis=1)[0]
+
     feature_names = vectorizer.get_feature_names_out()
-
-    for topic, comp in enumerate(lda_model.components_):
-        top_words = [feature_names[i] for i in comp.argsort()[-folder_word_limit:]] # Folder word length limit 
-        topic_words[topic] = top_words
-
-    max_topic_index = np.argmax(topic_distribution)
-    sorted_topic_indices = np.argsort(topic_distribution, axis=1)[0][::-1]
-
-    for topic_index in sorted_topic_indices:
-        if topic_index in topic_words:
-            max_topic_index = topic_index
-            break
-
-    topic_words[max_topic_index] = [word.capitalize() for word in topic_words[max_topic_index]]
-    new_folder_name = "_".join(topic_words[max_topic_index])
-
-    return new_folder_name
+    topic_words = lda_model.components_[dominant_topic_index]
+    top_word_indices = topic_words.argsort()[-folder_word_limit:][::-1] # Folder word length limit 
+    top_words = [feature_names[i] for i in top_word_indices]
+    
+    capitalized_words = [word.capitalize() for word in top_words]
+    folder_name = delimiter.join(capitalized_words)
+    
+    return folder_name
 
 
 # Handles moving files
@@ -106,10 +95,9 @@ def move_file(parent_dir, file_name, category_dir):
 
 
 # Organizing files that are similar (determined using NLP)
-def move_organize(path, folders_dict, words_list, file_names, folder_word_limit):
+def move_organize(path, folders_dict, words_list, folder_word_limit):
     for _, similar_files in folders_dict.items():
-
-        content = [os.path.splitext(files[0])[0] if file_names else files[1] for files in words_list if files[0] in similar_files]
+        content = [files[1] for files in words_list if files[0] in similar_files]
         new_dir = os.path.join(path, name_category(content, folder_word_limit)) # Name of the folder determined using topic modeling
 
         if not os.path.exists(new_dir):
@@ -132,8 +120,7 @@ def misc_organize(path):
         os.mkdir(misc_dir)
 
     for misc_file in misc_files:
-        file_ext = os.path.splitext(misc_file)[1]
-        file_ext = file_ext[1:]
+        file_ext = os.path.splitext(misc_file)[1][1:]
         parent_path = None
         for key, value in exts.items():
             if file_ext in value.split():
@@ -150,23 +137,23 @@ def misc_organize(path):
 
 
 # Organizing inside the generated folders
-def sub_organize(path, word_limit, file_names, folder_word_limit):
+def sub_organize(path, word_limit, folder_word_limit):
     for folder in os.listdir(path):
         sub_folder = os.path.join(path, folder)
         files = os.listdir(sub_folder)
 
         if len(files) > 6:
             sub_file_word_list = get_file_word_list(sub_folder, word_limit)
-            sub_folder_dict = sim_organize(0.8, sub_file_word_list, file_names) # Grouped only if similarity >=80%
+            sub_folder_dict = sim_organize(0.8, sub_file_word_list) # Grouped only if similarity >=80%
             
             if len(sub_folder_dict) > 1:
-                move_organize(sub_folder, sub_folder_dict, sub_file_word_list, file_names, folder_word_limit)
+                move_organize(sub_folder, sub_folder_dict, sub_file_word_list,  folder_word_limit)
 
 
 # Organizing the folder provided by the user
-def organize(path, file_dict, word_list, file_names, word_limit, folder_word_limit):
-    move_organize(path, file_dict, word_list, file_names, folder_word_limit)
+def organize(path, file_dict, word_list, word_limit, folder_word_limit):
+    move_organize(path, file_dict, word_list, folder_word_limit)
     misc_organize(path)
-    sub_organize(path, word_limit, file_names, folder_word_limit)
+    sub_organize(path, word_limit, folder_word_limit)
 
     return
