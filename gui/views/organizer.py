@@ -54,7 +54,6 @@ class ConnorGUI(QMainWindow):
         self.setup_menu_bar(menu_bar)
 
         # Default organization variables
-        self.names_only = False
         self.copy_files = False
         self.directories = []
         self.file_list = []
@@ -157,14 +156,6 @@ class ConnorGUI(QMainWindow):
         return_button.setGeometry(720, 5, 100, 30)
         return_button.clicked.connect(lambda _, screen=prev_screen: self.stacked_widget.setCurrentWidget(screen))
         return return_button
-    
-    # Update file names only checkbox
-    def file_names_checkbox_state(self):
-        checkbox = self.sender()
-        if checkbox.isChecked():
-            self.names_only = True
-        else:
-            self.names_only = False
 
     # Update move/copy files checkbox
     def copy_files_checkbox_state(self):
@@ -424,14 +415,14 @@ class ConnorGUI(QMainWindow):
         folder_path = os.path.relpath(self.folder_path_input.text(), os.getcwd())
         prep_files(folder_path, select_folder=True)
         self.file_list = get_file_word_list(folder_path, self.reading_word_limit)
-        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list, self.names_only)
+        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list)
         
         # Fitting the model based on the data provided
         data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
         lda_model.fit(data_vectorized)
 
         # Final organization process
-        organize(folder_path, folder_dict, self.file_list, self.names_only, self.reading_word_limit, self.folder_name_length)
+        organize(folder_path, folder_dict, self.file_list, self.reading_word_limit, self.folder_name_length)
         self.output_text.setHtml(make_tree(folder_path))
 
         # Switch to summary screen
@@ -448,14 +439,14 @@ class ConnorGUI(QMainWindow):
     def organize_uploaded_files(self):
         # Initializing the file names and content, and grouping them into a dictionary
         self.file_list = get_file_word_list(self.tmp_folder, self.reading_word_limit)
-        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list, self.names_only)
+        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list)
 
         # Fitting the model based on the data provided
         data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
         lda_model.fit(data_vectorized)
 
         # Final organization process
-        organize(self.tmp_folder, folder_dict, self.file_list, self.names_only, self.reading_word_limit, self.folder_name_length)
+        organize(self.tmp_folder, folder_dict, self.file_list, self.reading_word_limit, self.folder_name_length)
         self.output_text2.setHtml(make_tree(self.tmp_folder))
 
         # Switch to summary screen
