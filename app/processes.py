@@ -18,6 +18,7 @@ from app import data_path
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
 warnings.filterwarnings("ignore")
 TOPICS = 100
 
