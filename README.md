@@ -52,17 +52,19 @@ Graphical User Interface: Provides a simplistic and straightforward GUI for ease
 There are installation instructions for both GUI and CLI. You can choose the one you want to install. If you're opting for building the CLI from source then adding the file to path is recommended.
 
 ### Windows
-#### CLI (pip)
+#### CLI
 1. Make sure you have `python` and `pip` installed and added to path.
 2. Run `pip install connor-nlp`  
 
-#### EXE (GUI)
+#### EXE - GUI
 1. Go to the [latest release](https://github.com/ycatsh/connor/releases).
 3. Follow the steps there.
 2. Run the executable.  
 
+<br>
+
 ### Linux
-#### CLI (pip)
+#### CLI
 1. Make sure you have `python3` and `pip3` installed.
 2. Run `pip3 install connor-nlp`    
 
