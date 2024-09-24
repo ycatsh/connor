@@ -2,10 +2,11 @@ import configparser
 import shutil
 import os
 
-from app import data_path, tmp_path
+
 from app.processes import organize, get_file_word_list, sim_organize, vectorizer, lda_model
-from app.reader import prep_files
 from app.tree_builder import make_tree
+from app.reader import prep_files
+from app import data_path
 
 
 class ConnorCLI:
@@ -43,7 +44,7 @@ class ConnorCLI:
         terminal_width = shutil.get_terminal_size().columns
         separator = '-' * terminal_width
         print(separator)
-        print(f'To customize default settings instead run the command <connor settings -h>\nfolder_name_length: {self.folder_name_length}\nreading_word_limit: {self.reading_word_limit}\nsimilarity_threshold: {self.similarity_threshold}')
+        print(f'To customize default settings instead run the command <connor settings -h>\nfolder_name_length: {self.folder_name_length}\nreading_word_limit: {self.reading_word_limit}\nsimilarity_threshold: {self.similarity_threshold}%')
         print(separator)
         print(f"Folder '{folder_path}' is being organized...")
         
@@ -51,12 +52,12 @@ class ConnorCLI:
         folder_dict = {}
         prep_files(folder_path, select_folder=True)
         self.file_list = get_file_word_list(folder_path, self.reading_word_limit)
-        folder_dict = sim_organize(self.similarity_threshold / 100, self.file_list)
+        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list)
 
         # Fitting the model based on the data provided
         data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
         lda_model.fit(data_vectorized)
-        organize(folder_path, folder_dict, self.file_list, False, self.reading_word_limit, self.folder_name_length)
+        organize(folder_path, folder_dict, self.file_list, self.reading_word_limit, self.folder_name_length)
         print(separator)
         print(make_tree(folder_path, cli=True))
         print(f"Folder '{folder_path}' organized successfully.")
