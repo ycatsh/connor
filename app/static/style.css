@@ -1,0 +1,70 @@
+QMainWindow, QDialog {
+    background-color: #202020;
+}
+
+QLabel, QPushButton, QLineEdit, QTextEdit, QCheckBox, QMenu, QMenuBar {
+    color: #d6d2c8;
+}
+
+QPushButton {
+    background-color: #323232;
+    border: 2px solid #333;
+}
+
+QPushButton:hover {
+    background-color: #444;
+}
+
+QSlider::groove:horizontal {
+    background: #484848;
+    height: 8px;
+}
+
+QSlider::handle:horizontal {
+    background: #75a7ad;
+    border: 1px solid #333;
+    width: 10px;
+    height: 12px;
+    margin: -9px 0;
+}
+
+QCheckBox::indicator {
+    color: #75a7ad; 
+    width: 15px;
+    height: 15px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 1px solid #333;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #75a7ad;
+    border: 1px solid #75a7ad;
+}
+
+QTextEdit {
+    background-color: #333;
+    border: 1px solid #333;
+    color: white;
+    padding: 5px;
+}
+
+QLineEdit {
+    background-color: #323232;
+    border: 1px solid #333;
+    color: white;
+    padding: 5px;
+}
+
+QMenuBar, QMenuBar::item{
+    background-color: #202020;
+}
+
+QMenu, QMenu::item{
+    background-color: #484848;
+}
+
+QMenu::item:selected, QMenuBar::item:selected {
+    background-color: #75a7ad;
+}
