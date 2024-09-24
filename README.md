@@ -53,8 +53,6 @@ There are installation instructions for both GUI and CLI. You can choose the one
 3. Follow the steps there.
 2. Run the executable.  
 
-<br>
-
 ### Linux
 #### CLI (pip)
 1. Make sure you have `python3` and `pip3` installed.
@@ -116,6 +114,10 @@ To view help information for commands and options use the ``-h`` or `--help` fla
 connor -h
 ```
 
+<br>
+<br>
+
+
 ## Source
 #### 1. Clone repository:
 ```bash
@@ -140,6 +142,11 @@ For CLI:
 ```bash
 python run.py -h
 ```
+
+
+<br>
+<br>
+
 
 ## License
 This project is distributed under MIT License, which can be found in LICENSE in the root dir of the project. I reserve the right to place future versions of this project under a different license.
