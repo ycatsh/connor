@@ -17,18 +17,26 @@ Connor is a file organizer written in [python](https://www.python.org/). It make
 ## Features
 Connor works locally on your computer using a pre-trained NLP model `sentence-transformers/paraphrase-MiniLM-L6-v2` to understand the meaning of the data and calculate the cosine similarity between files. The folders are appropriately named using topic modeling through the Latent Dirichlet Allocation (LDA) technique.
 
+The file names and contents are read, then cosine similarity is used to calculate the similarity between the content of every file with respect to every other file. Based on the condition that the similarity scores between the files are above the provided threshold, the files are grouped in key-value pairs into a dictionary where each category corresponds to a folder. 
+
+The filenames and their contents in the selected folder are read, and cosine similarity is calculated to measure the similarity between the content of each file and every other file. Based on the condition that the similarity scores between the files are above the provided threshold, the files are grouped in key-value pairs into a dictionary where each category corresponds to a folder. 
+
+Latent Dirichlet Allocation technique is then used to generate topic names for the contents in each folder i.e. category in the dict. Using the most topic names, folders and created and the appropriate files are moved into their respective folders. 
+
+For files such as images (image support will be added later), executables, binaries, etc. that cannot be read are organized into a "Miscellaneous" folder based on their file extensions.
+
 <br>
 
-### File Organization
+### File Organization Summary
 1. Organize files within a selected folder or manually uploaded files (uploading files is only supported for GUI).
 2. Organize text-based files (`.docx`, `.txt`, `.pdf`, etc.) using NLP.
-3. Create a separate folder named ‘Miscellaneous’ for dissimilar or unprocessable files based on extension.
+3. Creates a separate folder named "Miscellaneous" for dissimilar or unprocessable files based on extension.
 4. Provide a summary (tree structure) of the organization process upon completion.
 
 ### Customization Options
-1. Similarity Threshold: Allows yous to choose a similarity percentage threshold for grouping similar files.
-2. Reading Word Limit: You can to set a limit on the number of words read from file content.
-3. Folder Name Word Limit: You can specify a maximum number of words allowed in the created folder names.
+1. Similarity Threshold: Allows you to choose a similarity percentage threshold for grouping similar files.
+2. Reading Word Limit: You can set a limit on the number of words to read from the file content.
+3. Folder Name Word Limit: You can specify the maximum number of words allowed in the created folder names.
 4. Default Parameters: You can modify these three parameters and save them for future sessions.
 
 ### User Preferences
