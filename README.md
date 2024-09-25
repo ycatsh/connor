@@ -2,7 +2,7 @@
 <img src="https://github.com/user-attachments/assets/2987085a-2e8c-4185-9b02-672ba687ca4b" alt="Connor">
 </h1>
 
-Connor is a file organizer written in [python](https://www.python.org/). It makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process and the [PyQt6](https://doc.qt.io/qtforpython-6/) GUI toolkit for the graphical user interface. It features a fast and fully local file organizer that uses natural language processing to organize computer files based on their textual content.
+Connor is a file organizer written in [python](https://www.python.org/). It makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process and the [PyQt6](https://doc.qt.io/qtforpython-6/) GUI toolkit for the graphical user interface. **It is by no means supposed to substitute for organzing files by hand. It is just a concept**. Connor features a fast and fully local file organizer that uses natural language processing to organize computer files based on their textual content.
 <br>
 
 <div align="center">
