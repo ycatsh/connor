@@ -110,7 +110,7 @@ connor settings --folder-name-length 3 --reading-word-limit 150 --similarity-thr
 <br>
 
 ### Help
-To view help information for commands and options use the ``-h`` or `--help` flag:  
+To view help information for commands and options use the ``-h`` or `--help` flag.  
 
 **Example:**
 ```console
