@@ -18,8 +18,6 @@ Connor works locally on your computer using a pre-trained NLP model `sentence-tr
 
 The file names and contents are read, then cosine similarity is used to calculate the similarity between the content of every file with respect to every other file. Based on the condition that the similarity scores between the files are above the provided threshold, the files are grouped in key-value pairs into a dictionary where each category corresponds to a folder. 
 
-The filenames and their contents in the selected folder are read, and cosine similarity is calculated to measure the similarity between the content of each file and every other file. Based on the condition that the similarity scores between the files are above the provided threshold, the files are grouped in key-value pairs into a dictionary where each category corresponds to a folder. 
-
 Latent Dirichlet Allocation technique is then used to generate topic names for the contents in each folder i.e. category in the dict. Using the most topic names, folders and created and the appropriate files are moved into their respective folders. 
 
 For files such as images (image support will be added later), executables, binaries, etc. that cannot be read are organized into a "Miscellaneous" folder based on their file extensions.
