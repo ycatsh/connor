@@ -46,24 +46,18 @@ Graphical User Interface: Provides a simplistic and straightforward GUI for ease
 
 
 ## Installation
-There are installation instructions for both GUI and CLI. You can choose the one you want to install. If you're opting for building the CLI from source then adding the file to path is recommended.
+There are installation instructions for both GUI and CLI. You can choose the one you want to install. If you're opting for building the application from [source](https://github.com/ycatsh/connor#source) then adding the run file to path is recommended.
 
-### Windows
-#### CLI
+**Install Connor via pip:**
 1. Make sure you have `python` and `pip` installed and added to path.
 2. Run `pip install connor-nlp`  
 
-#### EXE - GUI
-1. Go to the [latest release](https://github.com/ycatsh/connor/releases).
-3. Follow the steps there.
-2. Run the executable.  
-
 <br>
 
-### Linux
-#### CLI
-1. Make sure you have `python3` and `pip3` installed.
-2. Run `pip3 install connor-nlp`    
+**Install the GUI version of Connor (only for windows)**
+1. Go to the [latest release](https://github.com/ycatsh/connor/releases).
+3. Follow the steps there.
+2. Run the executable (`.exe`).  
 
 
 <br>
@@ -79,8 +73,7 @@ connor [command] [options]
 ```
 
 ### Commands
-#### `run`
-Run the folder organization process.
+#### `run`: Run the folder organization process.
 
 **Usage:**
 ```bash
@@ -95,8 +88,9 @@ connor run --path <folder_path>
 connor run --path /path/to/your/folder
 ```
 
-#### `settings`
-Update the default settings for the tool.
+<br>
+
+#### `settings`: Update the default settings for the tool.
 
 **Usage:**
 ```bash
@@ -113,12 +107,25 @@ connor settings [options]
 connor settings --folder-name-length 3 --reading-word-limit 150 --similarity-threshold 60
 ```
 
+<br>
+
 ### Help
 To view help information for commands and options use the ``-h`` or `--help` flag:  
 
 **Example:**
-```bash
-connor -h
+```console
+$ connor -h
+usage: Connor [-h] {settings,run} ...
+
+Connor: Fast and local NLP file organizer
+
+positional arguments:
+  {settings,run}
+    settings      Update the settings for the organizer
+    run           Run the folder organization process
+
+options:
+  -h, --help      show this help message and exit
 ```
 
 <br>
