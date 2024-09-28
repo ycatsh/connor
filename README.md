@@ -9,8 +9,7 @@ Connor is a file organizer written in [python](https://www.python.org/). It make
 
 ![releases](https://img.shields.io/github/v/release/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
 ![issues-open](https://img.shields.io/github/issues/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
-![commits](https://img.shields.io/github/downloads/ycatsh/connor/latest?color=507591&labelColor=1d1e1f&style=flat)
-![downloads](https://img.shields.io/github/stars/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
+![stars](https://img.shields.io/github/stars/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
 
 </div>
 
