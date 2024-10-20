@@ -83,6 +83,7 @@ def prep_files(directory, select_folder, copy_files=False):
 
 def read_files(directory, word_limit):
     words_list = []
+    misc_list = []
     for _, _, files in os.walk(directory):
         for file_name in files:
             root_path = os.path.join(directory, file_name)
@@ -92,5 +93,7 @@ def read_files(directory, word_limit):
                 file_extension = os.path.splitext(file_name)[1]
                 if file_extension in func_map:
                     words_list.append((file_name, func_map[file_extension](root_path, word_limit)))
+                else:
+                     misc_list.append(file_name)
 
-    return words_list
+    return words_list, misc_list
