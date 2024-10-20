@@ -3,7 +3,10 @@ import shutil
 import os
 
 
-from app.processes import organize, get_file_word_list, sim_organize, vectorizer, lda_model
+from app.processes import (
+    get_file_word_list, sim_organize, misc_handler, 
+    rename_folders, organize, vectorizer, lda_model
+)
 from app.tree_builder import make_tree
 from app.reader import prep_files
 from app import data_path
@@ -16,8 +19,8 @@ class ConnorCLI:
         self.settings.read(os.path.join(data_path, "config.ini"))
 
         # Load initial parameters from config
-        self.folder_name_length = int(self.settings["Parameters"].get("folder_name_length", 2))
-        self.reading_word_limit = int(self.settings["Parameters"].get("reading_word_limit", 100))
+        self.folder_name_length = int(self.settings["Parameters"].get("folder_name_length", 3))
+        self.reading_word_limit = int(self.settings["Parameters"].get("reading_word_limit", 200))
         self.similarity_threshold = int(self.settings["Parameters"].get("similarity_threshold", 50))
 
     def update_settings(self, folder_name_length=None, reading_word_limit=None, similarity_threshold=None):
@@ -51,14 +54,22 @@ class ConnorCLI:
         # Preparing files and organizing
         folder_dict = {}
         prep_files(folder_path, select_folder=True)
-        self.file_list = get_file_word_list(folder_path, self.reading_word_limit)
-        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list)
+        self.file_list, misc_list = get_file_word_list(folder_path, self.reading_word_limit)
+        folder_dict, misc_list = sim_organize(self.similarity_threshold/100, self.file_list, misc_list)
 
         # Fitting the model based on the data provided
         data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
         lda_model.fit(data_vectorized)
-        organize(folder_path, folder_dict, self.file_list, self.reading_word_limit, self.folder_name_length)
+
+        # Main Process
+        renamed_dict = rename_folders(folder_dict, self.file_list, self.folder_name_length, misc_list)
+        print(make_tree(path=folder_path, dict=renamed_dict, is_path_only=False, cli=True))
         print(separator)
-        print(make_tree(folder_path, cli=True))
-        print(f"Folder '{folder_path}' organized successfully.")
-        print(separator)
+        confirm = input(f"The above directory tree explains how the folder will be organized.\nDo you want to continue? [y/n] ")
+        if confirm.lower() == 'y' or confirm == '':
+            organize(folder_path, renamed_dict, self.reading_word_limit, self.folder_name_length)
+            print(f"Folder '{folder_path}' organized successfully.")
+            print(separator)
+        else:
+            print(f"Folder organization aborted. The files in {folder_path} were left untouched.")
+            print(separator)
