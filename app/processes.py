@@ -68,7 +68,7 @@ def preprocess(text):
 # Returns a tuple of files names and corresponding content and the ones which are not text-based (i.e. misc)
 def get_file_word_list(path, word_limit):
     raw_text_based, misc = read_files(path, word_limit)
-    text_based = [(file, preprocess(content)) for file, content in raw_text_based]
+    text_based = [(file, preprocess(content)) for file, content in raw_text_based if content]
     return text_based, misc
 
 
