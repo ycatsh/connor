@@ -20,7 +20,7 @@ The file names and contents are read, then cosine similarity is used to calculat
 
 Latent Dirichlet Allocation is then used to generate topic names for the contents in each folder, i.e., the categories in the dictionary. Folders are created using the most relevant topic names, and the corresponding files are then moved into their appropriate folders.
 
-For files such as images (image support will be added later), executables, binaries, etc. that cannot be read are organized into a "Miscellaneous" folder based on their file extensions.
+For files such as images (image support will be added later), executables, binaries, etc. that cannot be read are organized into a ``_misc`` folder based on their file extensions.
 
 <br>
 
