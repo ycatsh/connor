@@ -12,7 +12,7 @@ from PyQt6.QtCore import Qt, QFile, QTextStream, QIODevice
 from PyQt6 import QtCore
 
 from app.processes import (
-    organize, get_file_word_list, sim_organize, vectorizer, lda_model
+    get_file_word_list, rename_folders, sim_organize, organize, vectorizer, lda_model
 )
 from app import data_path, static_path, tmp_path, font_path
 from app.tree_builder import make_tree
@@ -33,8 +33,8 @@ class ConnorGUI(QMainWindow):
         self.settings = configparser.ConfigParser()
         self.settings.read(os.path.join(data_path, "config.ini"))
 
-        self.folder_name_length = int(self.settings["Parameters"].get("folder_name_length", 2))
-        self.reading_word_limit = int(self.settings["Parameters"].get("reading_word_limit", 100))
+        self.folder_name_length = int(self.settings["Parameters"].get("folder_name_length", 3))
+        self.reading_word_limit = int(self.settings["Parameters"].get("reading_word_limit", 200))
         self.similarity_threshold = int(self.settings["Parameters"].get("similarity_threshold", 50))
         
         self.init_ui()
@@ -50,6 +50,7 @@ class ConnorGUI(QMainWindow):
         self.central_layout.addWidget(self.stacked_widget)
 
         # Menubar
+        self.view_action = None
         menu_bar = self.menuBar()
         self.setup_menu_bar(menu_bar)
 
@@ -57,6 +58,7 @@ class ConnorGUI(QMainWindow):
         self.copy_files = False
         self.directories = []
         self.file_list = []
+        self.misc_list = []
         self.num_files = 0
         self.tmp_folder = os.path.join(tmp_path, "Organized_Files")
 
@@ -109,12 +111,21 @@ class ConnorGUI(QMainWindow):
                 action = QAction(item_name, self)
                 action.triggered.connect(item_action)
                 menu.addAction(action)
+                
+                if item_name == "Menu Bar":
+                    self.view_action = action
     
     # Alt key toggles menubar 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Alt:
             self.view_action.setChecked(not self.view_action.isChecked())
             self.toggle_menubar()
+
+    def toggle_menubar(self):
+        if self.menuBar().isVisible():
+            self.menuBar().hide()
+        else:
+            self.menuBar().show()
 
     # Updates font
     def update_font(self, widget, font, size=12):
@@ -132,13 +143,6 @@ class ConnorGUI(QMainWindow):
 
         for text in self.findChildren(QTextEdit):
             self.update_font(text, "Monospace", 14)
-
-    # Menubar toggle
-    def toggle_menubar(self):
-        if self.view_action.isChecked():
-            self.menuBar().show()
-        else:
-            self.menuBar().hide()
 
     # Settings pop-up (Allows the user to change default params)
     def show_settings(self):
@@ -353,7 +357,7 @@ class ConnorGUI(QMainWindow):
         layout = QVBoxLayout()
         self.screen4.setLayout(layout)
 
-        self.output_title = QLabel("Organize Folder Structure:")
+        self.output_title = QLabel("Folder Successfully organized:")
         self.output_title.setFixedSize(400, 30)
 
         # Organization summary text box
@@ -371,7 +375,7 @@ class ConnorGUI(QMainWindow):
         layout = QVBoxLayout()
         self.screen5.setLayout(layout)
 
-        self.output_title = QLabel("Organize Folder Structure:")
+        self.output_title = QLabel("Organized Folder Structure:")
         self.output_title.setFixedSize(400, 30)
 
         # Organization summary text box
@@ -395,23 +399,24 @@ class ConnorGUI(QMainWindow):
         selected_folder = QFileDialog.getExistingDirectory(self, 'Select Folder')
         if selected_folder.strip():
             self.folder_path_input.setText(selected_folder)
-            self.select_folder_tab.setHtml(make_tree(selected_folder))
+            self.select_folder_tab.setHtml(make_tree(path=selected_folder, dict=selected_folder, is_path_only=True, cli=False))
 
     # Organizes the selected folder
     def organize_selected_folder(self):
         # Initializing the file names and content, and grouping them into a dictionary
         folder_path = os.path.relpath(self.folder_path_input.text(), os.getcwd())
         prep_files(folder_path, select_folder=True)
-        self.file_list = get_file_word_list(folder_path, self.reading_word_limit)
-        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list)
+        self.file_list, self.misc_list = get_file_word_list(folder_path, self.reading_word_limit)
+        folder_dict, self.misc_list = sim_organize(self.similarity_threshold/100, self.file_list, self.misc_list)
         
         # Fitting the model based on the data provided
         data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
         lda_model.fit(data_vectorized)
 
         # Final organization process
-        organize(folder_path, folder_dict, self.file_list, self.reading_word_limit, self.folder_name_length)
-        self.output_text.setHtml(make_tree(folder_path))
+        renamed_dict = rename_folders(folder_dict, self.file_list, self.folder_name_length, self.misc_list)
+        organize(folder_path, renamed_dict, self.reading_word_limit, self.folder_name_length)
+        self.output_text.setHtml(make_tree(path=folder_path, dict=folder_path, is_path_only=True, cli=False))
 
         # Switch to summary screen
         self.show_screen4()
@@ -426,16 +431,17 @@ class ConnorGUI(QMainWindow):
     # Organizes the uploaded files
     def organize_uploaded_files(self):
         # Initializing the file names and content, and grouping them into a dictionary
-        self.file_list = get_file_word_list(self.tmp_folder, self.reading_word_limit)
-        folder_dict = sim_organize(self.similarity_threshold/100, self.file_list)
+        self.file_list, self.misc_list = get_file_word_list(self.tmp_folder, self.reading_word_limit)
+        folder_dict, self.misc_list = sim_organize(self.similarity_threshold/100, self.file_list, self.misc_list)
 
         # Fitting the model based on the data provided
         data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
         lda_model.fit(data_vectorized)
 
         # Final organization process
-        organize(self.tmp_folder, folder_dict, self.file_list, self.reading_word_limit, self.folder_name_length)
-        self.output_text2.setHtml(make_tree(self.tmp_folder))
+        renamed_dict = rename_folders(folder_dict, self.file_list, self.folder_name_length, self.misc_list)
+        organize(self.tmp_folder, renamed_dict, self.reading_word_limit, self.folder_name_length)
+        self.output_text2.setHtml(make_tree(path=self.tmp_folder, dict=self.tmp_folder, is_path_only=True, cli=False))
 
         # Switch to summary screen
         self.show_screen5()
@@ -492,6 +498,7 @@ class ConnorGUI(QMainWindow):
         self.uploaded_files_tab.setText("")
         self.directories = []
         self.file_list = []
+        self.misc_list = []
         self.num_files = 0
         self.uploaded_num_files.setText(f"Your Uploaded Files: <span style='color:#75a7ad;'>{self.num_files}</span>")
     
