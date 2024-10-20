@@ -71,5 +71,5 @@ class ConnorCLI:
             print(f"Folder '{folder_path}' organized successfully.")
             print(separator)
         else:
-            print(f"Folder organization aborted. The files in {folder_path} were left untouched.")
+            print(f"Folder organization aborted. The files in '{folder_path}' were left untouched.")
             print(separator)
