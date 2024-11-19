@@ -77,15 +77,15 @@ connor [command] [options]
 
 **Usage:**
 ```bash
-connor run --path <folder_path>
+connor run <folder_path>
 ```
 
 **Options:**
-- `--path`: Required. Absolute path to the folder that you want to organize.
+- `folder_path`: Required. Absolute path to the folder that you want to organize.
 
 **Example:**
 ```bash
-connor run --path /path/to/your/folder
+connor run /path/to/your/folder
 ```
 
 <br>
@@ -98,13 +98,33 @@ connor settings [options]
 ```
 
 **Options:**
-- `--folder-name-length`: Set the maximum length for folder names. (default: 2)
-- `--reading-word-limit`: Specify the word limit for reading files. (default: 100)
-- `--similarity-threshold`: Define the similarity threshold percentage. (default: 50)
+- `-f, --folder-word-limit`: Set the maximum length for folder names. (default: 2)
+- `-r, --reading-limit`: Specify the word limit for reading files. (default: 100)
+- `-t, --similarity-threshold`: Define the similarity threshold percentage. (default: 50)
+- `--show`: Show current settings
 
 **Example:**
 ```bash
-connor settings --folder-name-length 3 --reading-word-limit 150 --similarity-threshold 60
+connor settings -f 3 -r 150 -t 60
+```
+
+```console
+$ connor settings --show
+To see how to update: Connor settings [-h]
+
+Current settings:
+  folder words limit     2
+  reading limit          200
+  similarity threshold   50%
+```
+
+<br>
+
+#### `--gui`: Run Connor as a full fledged GUI from the terminal.
+
+**Usage:**
+```bash
+connor --gui
 ```
 
 <br>
@@ -115,7 +135,7 @@ To view help information for commands and options use the ``-h`` or `--help` fla
 **Example:**
 ```console
 $ connor -h
-usage: Connor [-h] {settings,run} ...
+usage: Connor [-h] [--gui] {settings,run} ...
 
 Connor: Fast and local NLP file organizer
 
@@ -126,6 +146,7 @@ positional arguments:
 
 options:
   -h, --help      show this help message and exit
+  --gui           Run the application in GUI mode.
 ```
 
 <br>
