@@ -20,7 +20,7 @@ tmp_path = get_path('tmp')
 
 
 # Organization Parameters and Models
-TOPICS = 30
+TOPICS = 50
 MISCELLANEOUS_FOLDER_NAME = "_misc"
 
 def initialize_dependencies():
