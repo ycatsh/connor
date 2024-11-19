@@ -11,12 +11,14 @@ from PyQt6.QtGui import QFont, QIcon, QAction, QFontDatabase
 from PyQt6.QtCore import Qt, QFile, QTextStream, QIODevice
 from PyQt6 import QtCore
 
-from app.processes import (
-    get_file_word_list, rename_folders, sim_organize, organize, vectorizer, lda_model
+from connor.processes import (
+    get_file_word_list, rename_folders, sim_organize, organize
 )
-from app import data_path, static_path, tmp_path, font_path
-from app.tree_builder import make_tree
-from app.reader import prep_files
+from connor import (
+    init, data_path, static_path, tmp_path, font_path
+)
+from connor.tree_builder import make_tree
+from connor.reader import prep_files
 from gui.views.settings import Settings
 from gui.views.about import About
 
@@ -28,6 +30,9 @@ class ConnorGUI(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
+
+        # Loads models
+        self.model, self.stop_words, self.lda_model, self.vectorizer = init()
 
         # Loads the default settings from config file
         self.settings = configparser.ConfigParser()
@@ -406,15 +411,16 @@ class ConnorGUI(QMainWindow):
         # Initializing the file names and content, and grouping them into a dictionary
         folder_path = os.path.relpath(self.folder_path_input.text(), os.getcwd())
         prep_files(folder_path, select_folder=True)
-        self.file_list, self.misc_list = get_file_word_list(folder_path, self.reading_word_limit)
-        folder_dict, self.misc_list = sim_organize(self.similarity_threshold/100, self.file_list, self.misc_list)
+        self.file_list, self.misc_list = get_file_word_list(folder_path, self.reading_word_limit, self.stop_words)
+        folder_dict, self.misc_list = sim_organize(self.model, self.similarity_threshold/100, self.file_list, self.misc_list)
         
         # Fitting the model based on the data provided
-        data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
-        lda_model.fit(data_vectorized)
+        data_vectorized = self.vectorizer.fit_transform(words[1] for words in self.file_list)
+        self.lda_model.fit(data_vectorized)
 
         # Final organization process
-        renamed_dict = rename_folders(folder_dict, self.file_list, self.folder_name_length, self.misc_list)
+        renamed_dict = rename_folders(self.vectorizer, self.lda_model, folder_dict, 
+                                      self.file_list, self.folder_name_length, self.misc_list)
         organize(folder_path, renamed_dict, self.reading_word_limit, self.folder_name_length)
         self.output_text.setHtml(make_tree(path=folder_path, dict=folder_path, is_path_only=True, cli=False))
 
@@ -431,15 +437,16 @@ class ConnorGUI(QMainWindow):
     # Organizes the uploaded files
     def organize_uploaded_files(self):
         # Initializing the file names and content, and grouping them into a dictionary
-        self.file_list, self.misc_list = get_file_word_list(self.tmp_folder, self.reading_word_limit)
-        folder_dict, self.misc_list = sim_organize(self.similarity_threshold/100, self.file_list, self.misc_list)
+        self.file_list, self.misc_list = get_file_word_list(self.tmp_folder, self.reading_word_limit, self.stop_words)
+        folder_dict, self.misc_list = sim_organize(self.model, self.similarity_threshold/100, self.file_list, self.misc_list)
 
         # Fitting the model based on the data provided
-        data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
-        lda_model.fit(data_vectorized)
+        data_vectorized = self.vectorizer.fit_transform(words[1] for words in self.file_list)
+        self.lda_model.fit(data_vectorized)
 
         # Final organization process
-        renamed_dict = rename_folders(folder_dict, self.file_list, self.folder_name_length, self.misc_list)
+        renamed_dict = rename_folders(self.vectorizer, self.lda_model, folder_dict, 
+                                      self.file_list, self.folder_name_length, self.misc_list)
         organize(self.tmp_folder, renamed_dict, self.reading_word_limit, self.folder_name_length)
         self.output_text2.setHtml(make_tree(path=self.tmp_folder, dict=self.tmp_folder, is_path_only=True, cli=False))
 
