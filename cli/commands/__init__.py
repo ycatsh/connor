@@ -1,1 +1,1 @@
-from cli.commands.command import ConnorCLI
+from .command import ConnorCLI

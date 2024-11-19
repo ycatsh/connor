@@ -2,7 +2,7 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from gui.views import ConnorGUI
+from .views import ConnorGUI
 
 
 def main():

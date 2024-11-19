@@ -1,1 +1,1 @@
-from gui.views.organizer import ConnorGUI
+from .organizer import ConnorGUI

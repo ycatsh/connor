@@ -1,4 +1,4 @@
-from cli.commands import ConnorCLI
+from .commands import ConnorCLI
 
 
 def main():
