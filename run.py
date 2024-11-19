@@ -1,7 +1,7 @@
 import argparse
 
-from gui.main import main as gui_main
-from cli.main import main as cli_main
+from gui import main as gui_main
+from cli import main as cli_main
 
 
 def main():
