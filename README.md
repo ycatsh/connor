@@ -54,7 +54,7 @@ There are installation instructions for both GUI and CLI. You can choose the one
 
 <br>
 
-**Install the GUI version of Connor (only for windows)**
+**Install the GUI version of Connor (executable)**
 1. Go to the [latest release](https://github.com/ycatsh/connor/releases).
 3. Follow the steps there.
 2. Run the executable (`.exe`).  
@@ -98,14 +98,14 @@ connor settings [options]
 ```
 
 **Options:**
-- `-f, --folder-word-limit`: Set the maximum length for folder names. (default: 2)
-- `-r, --reading-limit`: Specify the word limit for reading files. (default: 100)
+- `-f, --folder-word-limit`: Set the maximum length for folder names. (default: 3)
+- `-r, --reading-limit`: Specify the word limit for reading files. (default: 200)
 - `-t, --similarity-threshold`: Define the similarity threshold percentage. (default: 50)
 - `--show`: Show current settings
 
 **Example:**
 ```bash
-connor settings -f 3 -r 150 -t 60
+connor settings -f 2 -r 150 -t 60
 ```
 
 ```console
@@ -113,7 +113,7 @@ $ connor settings --show
 To see how to update: Connor settings [-h]
 
 Current settings:
-  folder words limit     2
+  folder words limit     3
   reading limit          200
   similarity threshold   50%
 ```
@@ -171,11 +171,24 @@ pip3 install -r requirements.txt
 #### 4. Run program:
 For GUI:
 ```bash
-python run.py --gui
+python3 run.py --gui
 ```
 For CLI:
 ```bash
-python run.py -h
+python3 run.py -h
+```
+
+#### 5. Install locally (optional):
+```bash
+pip3 install .
+```  
+  
+**Example:**  
+```bash
+connor --gui
+```
+```bash
+connor -h
 ```
 
 
