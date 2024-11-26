@@ -66,24 +66,28 @@ class ConnorCLI:
         folder_dict = {}
         prep_files(folder_path, select_folder=True)
         self.file_list, misc_list = get_file_word_list(folder_path, self.reading_word_limit, stop_words)
-        folder_dict, misc_list = sim_organize(model, self.similarity_threshold/100, self.file_list, misc_list)
+        folder_dict, misc_list = sim_organize(model, self.similarity_threshold / 100, self.file_list, misc_list)
 
         # Fitting the model based on the data provided
         data_vectorized = vectorizer.fit_transform(words[1] for words in self.file_list)
         lda_model.fit(data_vectorized)
 
         # Main Process
-        renamed_dict = rename_folders(vectorizer, lda_model, folder_dict, 
-                                      self.file_list, self.folder_name_length, misc_list)
-        
+        renamed_dict = rename_folders(vectorizer, lda_model, folder_dict, self.file_list, 
+                                      self.folder_name_length, misc_list)
         print(make_tree(path=folder_path, dict=renamed_dict, is_path_only=False, cli=True))
         print(self.separator)
         
-        confirm = input(f"The above directory tree explains how the folder will be organized.\nDo you want to continue? [y/n] ")
-        if confirm.lower() == 'y' or confirm == '':
-            organize(folder_path, renamed_dict, self.reading_word_limit, self.folder_name_length)
-            print(f"Folder '{folder_path}' organized successfully.")
-            print(self.separator)
-        else:
-            print(f"Folder organization aborted. The files in '{folder_path}' were left untouched.")
-            print(self.separator)
+        # Confirm Organization
+        try:
+            confirm = input(f"The above directory tree explains how the folder will be organized.\nDo you want to continue? [y/n] ")
+            if confirm.lower() == 'y' or confirm == '':
+                organize(folder_path, renamed_dict, self.reading_word_limit, self.folder_name_length, 
+                         vectorizer, lda_model, model, stop_words)
+                print(f"Folder '{folder_path}' organized successfully.")
+                print(self.separator)
+            else:
+                print(f"Folder organization aborted. The files in '{folder_path}' were left untouched.")
+                print(self.separator)
+        except KeyboardInterrupt:
+            print(f"\nAbort. The files in '{folder_path}' were left untouched.")
