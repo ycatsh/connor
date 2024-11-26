@@ -16,8 +16,16 @@ from connor.reader import read_files
 # pre-processesing the text to focus on relevant content
 def preprocess(text, stop_words):
     text = text.translate(str.maketrans('', '', string.punctuation))
-    text = [word.lower() for word in text.split() if word.lower() not in stop_words]
-    return ' '.join(text)
+    preprocessed = []
+    for word in text.split():
+        if word.lower() not in stop_words:
+            try:
+                num_word = int(word)
+                if num_word > 100: # Ignore small numbers in file names
+                    preprocessed.append(word)
+            except ValueError:
+                preprocessed.append(word)
+    return ' '.join(preprocessed)
 
 
 # Returns a tuple of files names and corresponding content and the ones which are not text-based (i.e. misc)
@@ -72,12 +80,25 @@ def name_category(vectorizer, lda_model, text_list, folder_word_limit=5, delimit
     feature_names = vectorizer.get_feature_names_out()
     topic_words = lda_model.components_[dominant_topic_index]
     top_word_indices = topic_words.argsort()[-folder_word_limit:][::-1] # Folder word length limit
+    top_words = [feature_names[i].capitalize() for i in top_word_indices]
+
+    folder_name = delimiter.join(top_words)
+    if folder_name:
+        return folder_name
+    else:
+        return folder_name_fallback(vectorizer, text_list, folder_word_limit)
+
+
+def folder_name_fallback(vectorizer, text_list, folder_word_limit=5, delimiter="_"):
+    text_vectorized = vectorizer.transform(text_list)
+    feature_names = vectorizer.get_feature_names_out()
+    scores = text_vectorized.sum(axis=0).A1
+    
+    top_word_indices = scores.argsort()[-folder_word_limit:][::-1]
     top_words = [feature_names[i] for i in top_word_indices]
-    
     capitalized_words = [word.capitalize() for word in top_words]
-    folder_name = delimiter.join(capitalized_words)
-    
-    return folder_name
+
+    return delimiter.join(capitalized_words)
 
 
 # Handling files that cannot be organized (misc)
@@ -110,9 +131,25 @@ def misc_handler(misc_files):
 # Re-name the folders with the names determined using topic modeling
 def rename_folders(vectorizer, lda_model, folder_dict, files_words_list, folder_word_limit, misc_files):
     renamed_dict = {}
+    folder_names = set()
+
+    def unique_folder_name_gen(content, base_name):
+        folder_name = name_category(vectorizer, lda_model, content, folder_word_limit)
+        if folder_name in folder_names:
+            folder_name = folder_name_fallback(vectorizer, content, folder_word_limit)
+    
+        counter = 1
+        while folder_name in folder_names:
+            folder_name = f"{base_name}_{counter}"
+            counter += 1
+
+        return folder_name
+
     for _, similar_files in folder_dict.items():
         content = [files[1] for files in files_words_list if files[0] in similar_files]
-        folder_name = name_category(vectorizer, lda_model, content, folder_word_limit)
+        base_name = name_category(vectorizer, lda_model, content, folder_word_limit)
+        folder_name = unique_folder_name_gen(content, base_name)
+        folder_names.add(folder_name)
         renamed_dict[folder_name] = similar_files
     misc_dict = misc_handler(misc_files)
 
@@ -129,8 +166,8 @@ def move_file(path, file_name, destination_path):
 
 
 # Organizing files that are similar (determined using NLP)
-def base_organize(path, folder_dict):
-    for folder, folder_content in folder_dict.items():
+def base_organize(path, renamed_dict):
+    for folder, folder_content in renamed_dict.items():
         folder_path = os.path.join(path, folder)
 
         if not os.path.exists(folder_path):
@@ -152,22 +189,24 @@ def base_organize(path, folder_dict):
 
 
 # Organizing inside the generated folders
-def sub_organize(path, folder_dict, word_limit, folder_word_limit):
+def sub_organize(path, folder_dict, word_limit, folder_word_limit, vectorizer, lda_model, model, stop_words):
     for folder, folder_content in folder_dict.items():
         sub_folder = os.path.join(path, folder)
 
         if len(folder_content) > 6:
-            sub_file_word_list = get_file_word_list(sub_folder, word_limit)[0]
-            sub_folder_dict = sim_organize(0.75, sub_file_word_list) # Grouped only if similarity >=75%
+            sub_file_word_list = get_file_word_list(sub_folder, word_limit, stop_words)[0]
+            sub_folder_dict = sim_organize(model, sub_file_word_list, simlarity_threshold=0.75) # Grouped only if similarity >=75%
 
             if len(sub_folder_dict) > 1:
-                sub_renamed_dict = rename_folders(sub_folder_dict, sub_file_word_list, folder_word_limit, misc_files={})
+                sub_renamed_dict = rename_folders(vectorizer, lda_model, sub_folder_dict, sub_file_word_list, 
+                                                  folder_word_limit, misc_files={})
                 base_organize(sub_folder, sub_renamed_dict)
 
 
 # Organizing the folder provided by the user
-def organize(path, folder_dict, word_limit, folder_word_limit):
+def organize(path, folder_dict, word_limit, folder_word_limit, vectorizer, lda_model, model, stop_words):
     base_organize(path, folder_dict)
-    sub_organize(path, folder_dict, word_limit, folder_word_limit)
+    sub_organize(path, folder_dict, word_limit, folder_word_limit, 
+                 vectorizer, lda_model, model, stop_words) 
 
     return
