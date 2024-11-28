@@ -2,8 +2,6 @@
 <img src="./.github/logo.png" alt="Connor">
 </h1>
 
-https://github.com/user-attachments/assets/b0d151c6-9a8b-4710-92e9-d410edc57b84
-
 Connor is a file organizer written in [python](https://www.python.org/). It makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process and the [PyQt6](https://doc.qt.io/qtforpython-6/) GUI toolkit for the graphical user interface. **It is by no means supposed to substitute for organzing files by hand. It is just a concept**. Connor features a fast and fully local file organizer that uses natural language processing to organize computer files based on their textual content.
 <br>
 
@@ -14,6 +12,8 @@ Connor is a file organizer written in [python](https://www.python.org/). It make
 ![stars](https://img.shields.io/github/stars/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
 
 </div>
+
+https://github.com/user-attachments/assets/b0d151c6-9a8b-4710-92e9-d410edc57b84
 
 ## Features
 Connor works locally on your computer using a pre-trained NLP model `sentence-transformers/paraphrase-MiniLM-L6-v2` to understand the meaning of the data and calculate the cosine similarity between files. The folders are appropriately named using topic modeling through the Latent Dirichlet Allocation (LDA) technique.
