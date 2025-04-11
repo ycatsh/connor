@@ -2,7 +2,7 @@
 <img src="./.github/logo.png" alt="Connor">
 </h1>
 
-Connor is a file organizer written in [python](https://www.python.org/). It makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process and the [PyQt6](https://doc.qt.io/qtforpython-6/) GUI toolkit for the graphical user interface. **It is by no means supposed to substitute for organzing files by hand. It is just a concept**. Connor features a fast and fully local file organizer that uses natural language processing to organize computer files based on their textual content.
+Connor is a file organizer written in [Python](https://www.python.org/). It makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process and the [PyQt6](https://doc.qt.io/qtforpython-6/) GUI toolkit for the graphical user interface. **It is by no means supposed to substitute for organzing files by hand. It is just a concept**. Connor features a fast and fully local file organizer that uses natural language processing to organize computer files based on their textual content.
 <br>
 
 <div align="center">
@@ -16,18 +16,14 @@ Connor is a file organizer written in [python](https://www.python.org/). It make
 https://github.com/user-attachments/assets/b0d151c6-9a8b-4710-92e9-d410edc57b84
 
 ## Features
-Connor works locally on your computer using a pre-trained NLP model `sentence-transformers/paraphrase-MiniLM-L6-v2` to understand the meaning of the data and calculate the cosine similarity between files. The folders are appropriately named using topic modeling through the Latent Dirichlet Allocation (LDA) technique.
+Connor runs locally using the `sentence-transformers/paraphrase-MiniLM-L6-v2` model to analyze file content and organize them based on semantic similarity. It uses cosine similarity to group similar files and applies Latent Dirichlet Allocation (LDA) to name folders.  
 
-The file names and contents are read, then cosine similarity is used to calculate the similarity between the content of every file with respect to every other file. Based on the condition that the similarity scores between the files are above the provided threshold, the files are grouped in key-value pairs into a dictionary where each category corresponds to a folder. 
-
-Latent Dirichlet Allocation is then used to generate topic names for the contents in each folder, i.e., the categories in the dictionary. Folders are created using the most relevant topic names, and the corresponding files are then moved into their appropriate folders.
-
-For files such as images (image support will be added later), executables, binaries, etc. that cannot be read are organized into a ``_misc`` folder based on their file extensions.
+Unprocessable files (e.g., images, binaries) are sorted into a `_misc` folder based on their extensions.
 
 <br>
 
 ### File Organization Summary
-1. Organize files within a selected folder or manually uploaded files (uploading files is only supported for GUI).
+1. Organize files in a selected folder (or uploaded via GUI).
 2. Organize text-based files (`.docx`, `.txt`, `.pdf`, etc.) using NLP.
 3. Creates a separate folder named "Miscellaneous" for dissimilar or unprocessable files based on extension.
 4. Provide a summary (tree structure) of the organization process upon completion.
@@ -39,8 +35,8 @@ For files such as images (image support will be added later), executables, binar
 4. Default Parameters: You can modify these three parameters and save them for future sessions.
 
 ### User Preferences
-Command Line Interface: Simple and concise command line interface to quickly organize folders.
-Graphical User Interface: Provides a simplistic and straightforward GUI for ease of use with upload files feature.
+**Command Line Interface**: Quick folder organization.
+**Graphical Interface**: Simple GUI with file upload support.
 
 
 <br>
