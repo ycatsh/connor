@@ -20,8 +20,6 @@ Connor runs locally using the `sentence-transformers/paraphrase-MiniLM-L6-v2` mo
 
 Unprocessable files (e.g., images, binaries) are sorted into a `_misc` folder based on their extensions.
 
-<br>
-
 ### Customization Options
 1. **Similarity Threshold:** Set the minimum similarity percentage threshold for grouping.
 2. **Reading Word Limit:** Limit how much of a file is read.
