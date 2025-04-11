@@ -22,20 +22,13 @@ Unprocessable files (e.g., images, binaries) are sorted into a `_misc` folder ba
 
 <br>
 
-### File Organization Summary
-1. Organize files in a selected folder (or uploaded via GUI).
-2. Organize text-based files (`.docx`, `.txt`, `.pdf`, etc.) using NLP.
-3. Creates a separate folder named "Miscellaneous" for dissimilar or unprocessable files based on extension.
-4. Provide a summary (tree structure) of the organization process upon completion.
-
 ### Customization Options
-1. Similarity Threshold: Allows you to choose a similarity percentage threshold for grouping similar files.
-2. Reading Word Limit: You can set a limit on the number of words to read from the file content.
-3. Folder Name Word Limit: You can specify the maximum number of words allowed in the created folder names.
-4. Default Parameters: You can modify these three parameters and save them for future sessions.
+1. **Similarity Threshold:** Set the minimum similarity percentage threshold for grouping.
+2. **Reading Word Limit:** Limit how much of a file is read.
+3. **Folder Name Word Limit:** Set max words for folder names.
 
 ### User Preferences
-**Command Line Interface**: Quick folder organization.
+**Command Line Interface**: Quick folder organization.  
 **Graphical Interface**: Simple GUI with file upload support.
 
 
