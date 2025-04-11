@@ -421,7 +421,8 @@ class ConnorGUI(QMainWindow):
         # Final organization process
         renamed_dict = rename_folders(self.vectorizer, self.lda_model, folder_dict, 
                                       self.file_list, self.folder_name_length, self.misc_list)
-        organize(folder_path, renamed_dict, self.reading_word_limit, self.folder_name_length)
+        organize(folder_path, renamed_dict, self.reading_word_limit, self.folder_name_length,
+                 self.vectorizer, self.lda_model, self.model, self.stop_words)
         self.output_text.setHtml(make_tree(path=folder_path, dict=folder_path, is_path_only=True, cli=False))
 
         # Switch to summary screen
@@ -447,7 +448,8 @@ class ConnorGUI(QMainWindow):
         # Final organization process
         renamed_dict = rename_folders(self.vectorizer, self.lda_model, folder_dict, 
                                       self.file_list, self.folder_name_length, self.misc_list)
-        organize(self.tmp_folder, renamed_dict, self.reading_word_limit, self.folder_name_length)
+        organize(self.tmp_folder, renamed_dict, self.reading_word_limit, self.folder_name_length,
+                 self.vectorizer, self.lda_model, self.model, self.stop_words)
         self.output_text2.setHtml(make_tree(path=self.tmp_folder, dict=self.tmp_folder, is_path_only=True, cli=False))
 
         # Switch to summary screen
