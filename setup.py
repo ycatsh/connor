@@ -6,30 +6,25 @@ with open('README.md', 'r') as file:
 setup(
     name='connor_nlp',
     version='1.0.0',
-    py_modules=['run'],
-    packages=find_packages(include=['connor', 'cli', 'gui', 'connor.*', 'cli.*', 'gui.*'],
-                           exclude=['connor/data', 'connor/static', 'connor/static/icons', 
-                                    'connor/fonts', 'connor/tmp']),
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
     include_package_data=True,
     package_data={
-        'connor': ['data/*', 'static/*', 'static/icons/*','fonts/*', 'tmp/*'],
+        'connor': ['resources/stopwords.json'],
     },
     install_requires=[
-        "docx==0.2.4",
-        "python_pptx==1.0.2",
-        "python_docx==0.8.11",
-        "nltk==3.9.1",
-        "numpy==2.1.3",
-        "odfpy==1.4.1",
-        "openpyxl==3.1.5",
-        "PyPDF2==3.0.1",
-        "PyQt6==6.7.1",
-        "scikit_learn==1.5.2",
-        "sentence_transformers==3.3.1",
+        "numpy==2.3.3"
+        "odfpy==1.4.1"
+        "openpyxl==3.1.5"
+        "PyPDF2==3.0.1"
+        "python_docx==1.2.0"
+        "python_pptx==1.0.2"
+        "scikit_learn==1.7.2"
+        "sentence_transformers==3.3.1"
     ],
     entry_points={
         'console_scripts': [
-            'connor=run:main',
+            'connor=main:main',
         ],
     },
     author='Ycatsh',
