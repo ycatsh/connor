@@ -2,7 +2,7 @@
 <img src="./.github/logo.png" alt="Connor">
 </h1>
 
-Connor is a file organizer written in [Python](https://www.python.org/). It makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process and the [PyQt6](https://doc.qt.io/qtforpython-6/) GUI toolkit for the graphical user interface. **It is by no means supposed to substitute for organzing files by hand. It is just a concept**. Connor features a fast and fully local file organizer that uses natural language processing to organize computer files based on their textual content.
+Connor is a fast and fully local file classifier and organizer. It is written in [Python](https://www.python.org/) and makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process.
 <br>
 
 <div align="center">
@@ -25,33 +25,54 @@ Unprocessable files (e.g., images, binaries) are sorted into a `_misc` folder ba
 2. **Reading Word Limit:** Limit how much of a file is read.
 3. **Folder Name Word Limit:** Set max words for folder names.
 
-### User Preferences
-**Command Line Interface**: Quick folder organization.  
-**Graphical Interface**: Simple GUI with file upload support.
-
 
 <br>
 <br>
 
 
 ## Installation
-There are installation instructions for both GUI and CLI. You can choose the one you want to install. If you're opting for building the application from [source](https://github.com/ycatsh/connor#source) then adding the run file to path is recommended.
 
-**Install Connor via pip:**
-1. Make sure you have `python` and `pip` installed and added to path.
-2. Run `pip install connor-nlp`  
+#### 1. Clone repository:
 
-<br>
+```bash
+git clone https://github.com/ycatsh/connor.git
+cd connor
+```  
 
-**Install the GUI version of Connor (executable)**
-1. Go to the [latest release](https://github.com/ycatsh/connor/releases).
-3. Follow the steps there.
-2. Run the executable (`.exe`).  
+#### 2. Create and activate virtual environment:
 
+Linux:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```  
 
-<br>
-<br>
+Windows:
+```bash
+python3 -m venv .venv
+.venv/bin/activate.bat
+```
 
+#### 3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+#### 4. Run program:
+```bash
+python src/main.py -h
+```
+
+#### 5. Install locally (optional):
+```bash
+pip install .
+```
+
+**Example:**  
+```bash
+connor -h
+```
+ 
 
 ## Usage
 
@@ -89,31 +110,21 @@ connor settings [options]
 **Options:**
 - `-f, --folder-word-limit`: Set the maximum length for folder names. (default: 3)
 - `-r, --reading-limit`: Specify the word limit for reading files. (default: 200)
-- `-t, --similarity-threshold`: Define the similarity threshold percentage. (default: 50)
-- `--show`: Show current settings
+- `-s, --similarity-threshold`: Define the similarity threshold percentage. (default: 50)
 
 **Example:**
 ```bash
-connor settings -f 2 -r 150 -t 60
+connor settings -f 2 -r 150 -s 60
 ```
 
 ```console
-$ connor settings --show
+$ connor settings
 To see how to update: Connor settings [-h]
 
 Current settings:
-  folder words limit     3
-  reading limit          200
-  similarity threshold   50%
-```
-
-<br>
-
-#### `--gui`: Run Connor as a full fledged GUI from the terminal.
-
-**Usage:**
-```bash
-connor --gui
+  folder words limit     2
+  reading limit          150
+  similarity threshold   60%
 ```
 
 <br>
@@ -124,60 +135,17 @@ To view help information for commands and options use the ``-h`` or `--help` fla
 **Example:**
 ```console
 $ connor -h
-usage: Connor [-h] [--gui] {settings,run} ...
+usage: connor [-h] {settings,run} ...
 
 Connor: Fast and local NLP file organizer
 
 positional arguments:
   {settings,run}
-    settings      Update the settings for the organizer
-    run           Run the folder organization process
+    settings      View or update settings.
+    run           Organize a folder.
 
 options:
   -h, --help      show this help message and exit
-  --gui           Run the application in GUI mode.
-```
-
-<br>
-<br>
-
-
-## Source
-#### 1. Clone repository:
-```bash
-git clone https://github.com/ycatsh/connor.git
-cd connor
-```  
-#### 2. Create and activate virtual environment:
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```  
-#### 3. Install dependencies:
-```bash
-pip3 install -r requirements.txt
-```
-#### 4. Run program:
-For GUI:
-```bash
-python3 run.py --gui
-```
-For CLI:
-```bash
-python3 run.py -h
-```
-
-#### 5. Install locally (optional):
-```bash
-pip3 install .
-```  
-  
-**Example:**  
-```bash
-connor --gui
-```
-```bash
-connor -h
 ```
 
 
