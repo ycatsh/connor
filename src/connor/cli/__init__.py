@@ -1,0 +1,1 @@
+from connor.cli.commands import ConnorCLI
