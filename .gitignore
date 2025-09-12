@@ -1,3 +1,7 @@
+# model cache
+src/connor/resources/model_cache
+src/connor/resources/model_cache/*
+
 # Releases
 .releases/
 
