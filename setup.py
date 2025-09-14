@@ -28,7 +28,7 @@ setup(
         ],
     },
     author='Ycatsh',
-    description='Fast and fully local NLP file organizer that organizes files based on their content.',
+    description='Fast file organizer and classifier that categorizes file based on content using NLP',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/ycatsh/connor',
