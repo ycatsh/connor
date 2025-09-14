@@ -2,12 +2,12 @@
 <img src="./.github/logo.png" alt="Connor">
 </h1>
 
-Connor is a fast and fully local file classifier and organizer. It is written in [Python](https://www.python.org/) and makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process.
+Connor is a fast and fully local file classifier and organizer. It is written in [Python](https://www.python.org/) and makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process. **It is by no means supposed to substitute for organzing files by hand. It is just a concept**
+
 <br>
 
 <div align="center">
 
-![releases](https://img.shields.io/github/v/release/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
 ![issues-open](https://img.shields.io/github/issues/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
 ![stars](https://img.shields.io/github/stars/ycatsh/connor?color=507591&labelColor=1d1e1f&style=flat)
 
@@ -49,7 +49,7 @@ source .venv/bin/activate
 
 Windows:
 ```bash
-python3 -m venv .venv
+python -m venv .venv
 .venv/bin/activate.bat
 ```
 
@@ -113,8 +113,9 @@ connor settings [options]
 - `-s, --similarity-threshold`: Define the similarity threshold percentage. (default: 50)
 
 **Example:**
-```bash
-connor settings -f 2 -r 150 -s 60
+```console
+$ connor settings -f 2 -r 150 -s 60
+Settings updated successfully.
 ```
 
 ```console
