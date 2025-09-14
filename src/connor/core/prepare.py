@@ -8,7 +8,7 @@ from connor.core.reader import read_files
 def preprocess(text: str, stop_words: Set[str]) -> str:
     """
     Pre-process text by removing punctuation, ignoring stop words and small numbers.
-    1
+
     Args:
         text: Input text string.
         stop_words: Set of stop words to ignore.
@@ -30,7 +30,8 @@ def preprocess(text: str, stop_words: Set[str]) -> str:
 
 
 def get_files_list(folder_to_organize: Path, word_limit: int, stop_words):
-    """Get list of files with processed content and list of miscellaneous files.
+    """
+    Get list of files with processed content and list of miscellaneous files.
 
     Args:
         folder_to_organize: Path to folder.

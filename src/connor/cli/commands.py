@@ -11,7 +11,9 @@ from connor.core.organize import (
 
 class ConnorCLI:
     def __init__(self):
-        """Initialize with settings from config file."""
+        """
+        Initialize with settings from config file.
+        """
         self.config_path = get_config_file()
 
         self.settings = configparser.ConfigParser()
@@ -35,11 +37,6 @@ class ConnorCLI:
     ) -> None:
         """
         Update configuration settings and save to the config file.
-
-        Args:
-            folder_word_limit: Maximum words per folder name.
-            reading_word_limit: Maximum words to read per file.
-            similarity_threshold: Similarity threshold for grouping files.
         """
         if folder_word_limit is not None:
             self.folder_word_limit = folder_word_limit

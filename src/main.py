@@ -30,7 +30,7 @@ def main():
             cli.show_settings()
 
     elif args.command == 'run':
-        cli.organize_folder(args.folder)
+        cli.organize_folder(args.path)
 
 
 if __name__ == "__main__":
