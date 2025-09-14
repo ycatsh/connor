@@ -60,7 +60,7 @@ pip install -r requirements.txt
 
 #### 4. Run program:
 ```bash
-python src/main.py -h
+python src/connor/main.py -h
 ```
 
 #### 5. Install locally (optional):
