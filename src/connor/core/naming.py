@@ -15,8 +15,7 @@ def name_category(
     Generate a folder name using TF-IDF keyword extraction.
 
     Args:
-        vectorizer: Unused (kept for compatibility).
-        lda_model: Unused (kept for compatibility).
+        vectorizer: TD-IDF
         content_list: List of file contents in a cluster.
         folder_word_limit: Maximum number of words in folder name.
         delimiter: Delimiter between words.
