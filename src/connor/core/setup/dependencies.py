@@ -1,48 +1,88 @@
 import os
 import warnings
+from pathlib import Path
 from typing import Any, Set, Tuple
 
-from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from .config import get_model_cache_dir, load_stopwords
 
 
-def initialize_models(topics: int = 50) -> Tuple[Any, Set[str], LatentDirichletAllocation, TfidfVectorizer]:
+def _setup_cache_environment(cache_dir: Path) -> None:
     """
-    Loads stopwords, loads SentenceTransformer, LDA model, and TF-IDF vectorizer.
+    Configure environment variables for model caching.
 
     Args:
-        topics: Number of topics for LDA model. Defaults to 50.
+        cache_dir: Directory to store cached models.
+    """
+    os.makedirs(cache_dir, exist_ok=True)
+
+    os.environ["HF_HOME"] = str(cache_dir)
+    os.environ["HF_HUB_CACHE"] = str(cache_dir)
+
+
+def _load_embedding_model(cache_dir: Path) -> SentenceTransformer:
+    """
+    Load the sentence embedding model with caching.
+
+    Args:
+        cache_dir: Directory for caching model files.
+
+    Returns:
+        Loaded SentenceTransformer model.
+    """
+    return SentenceTransformer(
+        "BAAI/bge-base-en-v1.5",
+        cache_folder=str(cache_dir),
+    )
+
+
+def _initialize_vectorizer() -> TfidfVectorizer:
+    """
+    Initialize TF-IDF vectorizer.
+
+    Returns:
+        Configured TfidfVectorizer instance.
+    """
+    return TfidfVectorizer(
+        max_df=0.8,
+        min_df=2,
+        stop_words="english",
+    )
+
+
+def initialize_models() -> Tuple[Any, Set[str], TfidfVectorizer]:
+    """
+    Initialize all models and dependencies required for the pipeline.
+
+    This includes:
+    - Sentence embedding model (cached locally)
+    - Stopwords
+    - TF-IDF vectorizer
 
     Returns:
         Tuple containing:
-            SentenceTransformer model
-            Set of stopwords
-            LDA model
-            TF-IDF vectorizer
+            model: SentenceTransformer instance
+            stop_words: Set of stopwords
+            vectorizer: TF-IDF vectorizer
     """
     warnings.filterwarnings("ignore")
 
-    print("Loading dependencies...")
+    print("Initializing models...")
 
     cache_dir = get_model_cache_dir()
-    os.environ["TRANSFORMERS_CACHE"] = str(cache_dir)
-    os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(cache_dir)
+    _setup_cache_environment(cache_dir)
 
-    print(f"Using model cache directory: {cache_dir}")
+    print(f"Cache directory: {cache_dir}")
 
-    model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
-    print("Sentence Transformer loaded.")
+    model = _load_embedding_model(cache_dir)
+    print("Embedding model loaded")
 
     stop_words = load_stopwords()
-    print("Stopwords loaded.")
+    print("Stopwords loaded")
 
-    lda_model = LatentDirichletAllocation(n_components=topics, learning_decay=0.7, random_state=0)
-    print("LDA model initialized.")
+    vectorizer = _initialize_vectorizer()
+    print("TF-IDF vectorizer ready")
 
-    vectorizer = TfidfVectorizer(max_df=0.8, min_df=2, stop_words='english')
-    print("TF-IDF vectorizer initialized.")
-
-    return model, stop_words, lda_model, vectorizer
+    return model, stop_words, vectorizer

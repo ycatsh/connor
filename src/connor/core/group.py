@@ -1,49 +1,48 @@
 from typing import List, Tuple, Dict, Any
+from collections import defaultdict
 
-from numpy import dot
-from numpy.linalg import norm
-
-
-def calculate_similarity(embeddings: List) -> float:
-    """
-    Calculate cosine similarity between two embeddings.
-    """
-    return dot(embeddings[0], embeddings[1]) / (norm(embeddings[0]) * norm(embeddings[1]))
+import numpy as np
+from sklearn.cluster import KMeans
 
 
 def group_files_into_dict(
     model: Any,
     files_list: List[Tuple[str, str]],
-    similarity_threshold: float
 ) -> Dict[str, List[str]]:
     """
-    Organize files into a dictionary by similarity using cosine similarity.
+    Organize files into clusters using KMeans.
 
     Args:
-        model: The sentence-tranformers model.
+        model: SentenceTransformer model.
         files_list: List of tuples (file_name, content).
-        sim_threshold: Similarity threshold for grouping.
 
     Returns:
         Dictionary mapping a representative file to a list of similar files.
     """
-    grouped_files = set()
+
+    if not files_list:
+        return {}
+
+    file_names = [pair[0] for pair in files_list]
+    texts = [pair[1] for pair in files_list]
+
+    embeddings = model.encode(texts, normalize_embeddings=True)
+    X = np.array(embeddings)
+
+    n_clusters = int(len(files_list) ** 0.5)
+
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(X)
+
+    raw_clusters = defaultdict(list)
+
+    for name, label in zip(file_names, labels):
+        raw_clusters[label].append(name)
+
     grouped_files_dict = {}
-    embeddings = model.encode([pair[1] for pair in files_list], convert_to_tensor=True)
 
-    for i, parent_files in enumerate(files_list):
-        if parent_files[0] not in grouped_files:
-            for j, other_files in enumerate(files_list):
-                if i != j and other_files[0] not in grouped_files:
-                    score = calculate_similarity([embeddings[i], embeddings[j]])
-
-                    if score >= similarity_threshold:
-                        if parent_files[0] not in grouped_files_dict:
-                            grouped_files_dict[parent_files[0]] = [parent_files[0]]
-
-                        grouped_files_dict[parent_files[0]].append(other_files[0])
-                        grouped_files.add(other_files[0])
-
-            grouped_files.add(parent_files[0])
+    for label, files in raw_clusters.items():
+        parent = files[0]
+        grouped_files_dict[parent] = files
 
     return grouped_files_dict
