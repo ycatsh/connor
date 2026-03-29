@@ -13,14 +13,15 @@ setup(
         'connor': ['resources/stopwords.json'],
     },
     install_requires=[
-        "numpy==2.3.3",
+        "numpy==2.4.4",
         "odfpy==1.4.1",
         "openpyxl==3.1.5",
+        "platformdirs==4.9.4",
         "PyPDF2==3.0.1",
         "python_docx==1.2.0",
         "python_pptx==1.0.2",
         "scikit_learn==1.7.2",
-        "sentence_transformers==3.3.1"
+        "sentence_transformers==3.3.1"    
     ],
     entry_points={
         'console_scripts': [
