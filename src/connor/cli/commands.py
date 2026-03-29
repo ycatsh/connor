@@ -18,22 +18,21 @@ class ConnorCLI:
 
         self.settings = configparser.ConfigParser()
         self.settings.read(self.config_path)
+        print("Looking for config at:", self.config_path)
 
-        self.folder_word_limit = int(self.settings["Parameters"].get("folder_word_limit", 3))
+        self.folder_word_limit = int(self.settings["Parameters"].get("folder_word_limit", 2))
         self.reading_word_limit = int(self.settings["Parameters"].get("reading_word_limit", 200))
-        self.similarity_threshold = int(self.settings["Parameters"].get("similarity_threshold", 50))
         self.exts = self.settings["Extension_Map"]
 
         terminal_width = shutil.get_terminal_size().columns
         self.separator = '-' * terminal_width
 
-        self.model, self.stop_words, self.lda_model, self.vectorizer = initialize_models()
+        self.model, self.stop_words, self.vectorizer = initialize_models()
 
     def update_settings(
         self,
         folder_word_limit: Optional[int] = None,
         reading_word_limit: Optional[int] = None,
-        similarity_threshold: Optional[int] = None
     ) -> None:
         """
         Update configuration settings and save to the config file.
@@ -44,9 +43,6 @@ class ConnorCLI:
         if reading_word_limit is not None:
             self.reading_word_limit = reading_word_limit
             self.settings["Parameters"]["reading_word_limit"] = str(reading_word_limit)
-        if similarity_threshold is not None:
-            self.similarity_threshold = similarity_threshold
-            self.settings["Parameters"]["similarity_threshold"] = str(similarity_threshold)
 
         # Save updated settings to config file
         with open(self.config_path, "w") as configfile:
@@ -61,7 +57,6 @@ class ConnorCLI:
         print("\nCurrent settings:")
         print(f"  {'folder words limit':<22} {self.folder_word_limit}")
         print(f"  {'reading limit':<22} {self.reading_word_limit}")
-        print(f"  {'similarity threshold':<22} {self.similarity_threshold}%")
 
     def organize_folder(self, folder_to_organize: str) -> None:
         """
@@ -74,7 +69,7 @@ class ConnorCLI:
             return
         
         print(self.separator)
-        print(f'To customize default settings instead run the command <connor settings -h>\nfolder_word_limit: {self.folder_word_limit}\nreading_word_limit: {self.reading_word_limit}\nsimilarity_threshold: {self.similarity_threshold}%')
+        print(f'To customize default settings instead run the command <connor settings -h>\nfolder_word_limit: {self.folder_word_limit}\nreading_word_limit: {self.reading_word_limit}')
         print(self.separator)
         print(f"Folder '{folder_to_organize}' is being organized...")
         
@@ -82,13 +77,11 @@ class ConnorCLI:
         renamed_dict, tree = start_run(
             folder_to_organize=folder_to_organize, 
             reading_word_limit=self.reading_word_limit,
-            similarity_threshold=self.similarity_threshold,
             folder_word_limit=self.folder_word_limit,
             exts=self.exts,
             model=self.model,
-            vectorizer=self.vectorizer,
-            lda_model=self.lda_model,
-            stop_words=self.stop_words
+            stop_words=self.stop_words,
+            vectorizer=self.vectorizer
         )
         print(tree)
         print(self.separator)
