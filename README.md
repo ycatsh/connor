@@ -2,7 +2,7 @@
 <img src="./.github/logo.png" alt="Connor">
 </h1>
 
-Connor is a fast and fully local file classifier and organizer. It is written in [Python](https://www.python.org/) and makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process. **It is by no means supposed to substitute for organzing files by hand. It is just a concept**
+Connor is a fast and fully local file classifier and organizer. It is written in [Python](https://www.python.org/) and makes use of the [sentence-transformers](https://sbert.net/) framework for the main organization process. **It is by no means supposed to substitute for organzing files by hand, rather it can be viewed as a tool to accelerate it.**
 
 <br>
 
@@ -16,12 +16,13 @@ Connor is a fast and fully local file classifier and organizer. It is written in
 https://github.com/user-attachments/assets/b0d151c6-9a8b-4710-92e9-d410edc57b84
 
 ## Features
-Connor runs locally using the `sentence-transformers/paraphrase-MiniLM-L6-v2` model to analyze file content and organize them based on semantic similarity. It uses cosine similarity to group similar files and applies Latent Dirichlet Allocation (LDA) to name folders.  
+Connor runs locally using the `BAAI/bge-base-en-v1.5` model to analyze file content and organize them based on semantic similarity.  
+
+It generates embeddings for each file and clusters them using KMeans. Folder names are created using TF-IDF keyword extraction, producing stable and interpretable labels for each group.  
 
 Unprocessable files (e.g., images, binaries) are sorted into a `_misc` folder based on their extensions.
 
 ### Customization Options
-1. **Similarity Threshold:** Set the minimum similarity percentage threshold for grouping.
 2. **Reading Word Limit:** Limit how much of a file is read.
 3. **Folder Name Word Limit:** Set max words for folder names.
 
@@ -72,6 +73,8 @@ pip install .
 ```bash
 connor -h
 ```
+
+<br>
  
 
 ## Usage
@@ -98,9 +101,10 @@ connor run <folder_path>
 connor run /path/to/your/folder
 ```
 
-<br>
-
 #### `settings`: Update the default settings for the tool.
+
+<br>
+<br>
 
 **Usage:**
 ```bash
@@ -110,11 +114,10 @@ connor settings [options]
 **Options:**
 - `-f, --folder-word-limit`: Set the maximum length for folder names. (default: 3)
 - `-r, --reading-limit`: Specify the word limit for reading files. (default: 200)
-- `-s, --similarity-threshold`: Define the similarity threshold percentage. (default: 50)
 
 **Example:**
 ```console
-$ connor settings -f 2 -r 150 -s 60
+$ connor settings -f 2 -r 150
 Settings updated successfully.
 ```
 
@@ -125,7 +128,6 @@ To see how to update: Connor settings [-h]
 Current settings:
   folder words limit     2
   reading limit          150
-  similarity threshold   60%
 ```
 
 <br>
