@@ -63,7 +63,8 @@ def file_vectors(
 def _normalize(vectors: NDArray[np.float32]) -> NDArray[np.float32]:
     norms = np.linalg.norm(vectors, axis=1, keepdims=True)
     norms[norms == 0] = 1.0
-    return (vectors / norms).astype(np.float32)
+    unit: NDArray[np.float32] = (vectors / norms).astype(np.float32)
+    return unit
 
 
 def model_dir(name: str, cache: Path) -> Path:

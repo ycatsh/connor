@@ -80,28 +80,32 @@ class Term:
 def _read_key(inp: TextIO) -> str:
     if not inp.isatty():
         return inp.readline().strip()[:1]
-    if sys.platform == "win32":
-        import msvcrt
-
-        key = msvcrt.getwch()
-    else:
-        key = _read_posix_key(inp)
+    key = _raw_key(inp)
     if key == "\x03":
         raise KeyboardInterrupt
     return key.strip()
 
 
-def _read_posix_key(inp: TextIO) -> str:
-    import termios
-    import tty
+if sys.platform == "win32":
 
-    descriptor = inp.fileno()
-    saved = termios.tcgetattr(descriptor)
-    try:
-        tty.setcbreak(descriptor)
-        return inp.read(1)
-    finally:
-        termios.tcsetattr(descriptor, termios.TCSADRAIN, saved)
+    def _raw_key(inp: TextIO) -> str:
+        import msvcrt
+
+        return msvcrt.getwch()
+
+else:
+
+    def _raw_key(inp: TextIO) -> str:
+        import termios
+        import tty
+
+        descriptor = inp.fileno()
+        saved = termios.tcgetattr(descriptor)
+        try:
+            tty.setcbreak(descriptor)
+            return inp.read(1)
+        finally:
+            termios.tcsetattr(descriptor, termios.TCSADRAIN, saved)
 
 
 def truncate(text: str, width: int) -> str:
