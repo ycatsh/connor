@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run mypy
+
+      - name: Test
+        run: uv run pytest -q
+
+  model:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - uses: actions/cache@v4
+        with:
+          path: .model-cache
+          key: model-potion-base-8M
+
+      - name: Download model
+        run: >
+          uv run python -c "from pathlib import Path;
+          from connor.core.embed import download_model, model_dir;
+          cache = Path('.model-cache');
+          model_dir('minishlab/potion-base-8M', cache).exists()
+          or download_model('minishlab/potion-base-8M', cache)"
+
+      - name: Real model tests
+        env:
+          CONNOR_TEST_MODEL_CACHE: .model-cache
+        run: uv run pytest tests/test_real_model.py -q
