@@ -1,0 +1,49 @@
+name: Bug report
+description: Something is broken or behaving incorrectly.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. If the bug could move, rename or lose someone's files, or leak file contents, please use private vulnerability reporting instead (Security tab -> Report a vulnerability).
+
+        Never paste real file names or file contents from your personal files/disk. Use made-up names that show the same problem.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The command you ran, a made-up folder layout, and the relevant part of your config.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `connor --version`.
+    validations:
+      required: false
+
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system
+      description: For example Ubuntu 24.04, macOS 15 or Windows 11.
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output or traceback
+      description: Replace real paths with made-up ones before pasting.
+      render: shell

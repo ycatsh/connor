@@ -1,0 +1,32 @@
+name: AI commit prefix
+
+on:
+  pull_request:
+
+jobs:
+  ai-commit-prefix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require "[AI]" prefix on AI-authored commits
+        run: |
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          failed=0
+
+          for sha in $(git rev-list "$base..$head"); do
+            subject="$(git log -1 --format=%s "$sha")"
+            body="$(git log -1 --format=%B "$sha")"
+
+            if echo "$body" | grep -qiE '^co-authored-by:.*(claude|copilot|codex|chatgpt|gpt-|gemini|\bai\b)'; then
+              if [[ "$subject" != "[AI]"* ]]; then
+                echo "::error::Commit $sha is AI-authored (Co-Authored-By trailer) but its subject is missing the [AI] prefix: $subject"
+                failed=1
+              fi
+            fi
+          done
+
+          exit "$failed"
