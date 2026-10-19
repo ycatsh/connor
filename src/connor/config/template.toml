@@ -1,55 +1,67 @@
 # connor config
-# Every key is optional. Run `connor config` to see the values in effect.
-# Paths are relative to [library].root unless they start with / or ~.
-# Globs: * is one folder level, ** is any depth.
+
+# Run `connor config` to check it.
+# Paths are relative to [library] root. In globs, * is one folder and ** any depth.
+# Hidden folders, repos, vaults and build dirs are always skipped.
 
 [inbox]
-dirs    = ["~"]                       # only loose files at the top are sorted
-min_age = "2m"                        # skip files changed more recently
+dirs    = ["~"]
+min_age = "2m"
 ignore  = ["*.part", "*.crdownload", "*.tmp"]
 
 [library]
 root      = "~"
-include   = []                        # folders connor may sort into. empty = all
-exclude   = []                        # removed from include
+include   = []
+exclude   = []
 max_depth = 8
-# Always skipped, even if included: hidden folders, repos (.git, pyproject.toml,
-# package.json, .venv), vaults (.obsidian), app bundles, build dirs, and folders
-# with a .connorignore file.
 
 [sorting]
-apply       = "high"                  # what --yes and watch apply: high or med
-new_folders = false                   # group leftovers into new folders? always on when
-                                      # the library has no folders yet
-rename      = "scheme"                # off, scheme, or junk (scheme + fix junk names elsewhere)
-dupes       = "skip"                  # skip or move (to <inbox>/_duplicates)
+apply       = "high"    # high or med
+new_folders = false
+rename      = "scheme"  # off, scheme or junk
+dupes       = "skip"    # skip or move
 
-[names]                               # defaults for every scheme
-format      = "{date}_{title}"        # used for junk names outside any scheme
-date_format = "%Y-%m-%d"              # allowed: %Y %m %d %y %b
-date_from   = ["content", "modified"] # where {date} comes from, in order
-title_from  = "name"                  # name: clean the old name. content: doc title or first line
-separator   = "_"                     # replaces spaces inside fields
-case        = "keep"                  # keep, lower or title
+[names]
+format      = "{date}_{title}"
+date_format = "%Y-%m-%d"
+date_from   = ["content", "modified"]
+title_from  = "name"    # name or content
+separator   = "_"
+case        = "keep"    # keep, lower or title
 max_length  = 80
 
-# One block per naming scheme. Fields: {date} {title} {folder} {parent} {n} {n:02} {name}
+# Naming schemes, one block each. A scheme can override any [names] key.
+# Fields: {date} {title} {folder} {parent} {n} {n:02} {name}
+
 # [[names.scheme]]
 # name    = "course"
-# folders = ["university/*/*"]
+# folders = ["school/*/*/*"]
 # format  = "{date}_{folder}_{title}"
-# case    = "lower"                   # any [names] key can be overridden here
 
-# Fixed placement, no guessing. The target must be an allowed folder.
+# [[names.scheme]]
+# name        = "invoices"
+# folders     = ["finance/invoices"]
+# format      = "{date}_{title}"
+# date_format = "%Y-%m"
+
+# [[names.scheme]]
+# name    = "lessons"
+# folders = ["work/*/lessons"]
+# format  = "{n:02}_{title}"
+# case    = "lower"
+
+# Rules place files by name, before anything else.
+
 # [[rules]]
 # match = ["*.deb", "*.AppImage"]
-# to    = "installers"
+# to    = "software/installers"
 
-[categories]                          # for `connor sort --by` with no values
+# Labels for `connor sort --by`, with words that describe them.
+[categories]
 # Invoices = "invoice bill amount due"
 
 [watch]
-schedule = "0 3 * * *"                # cron: minute hour day month weekday. or @daily, @weekly
+schedule = "0 3 * * *"  # cron, or @daily, @weekly
 
 [model]
 name       = "minishlab/potion-base-8M"

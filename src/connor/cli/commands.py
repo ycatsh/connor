@@ -471,8 +471,8 @@ def _init_config(ctx: Context, path: Path) -> int:
     root = load_config(path).library.root
     lines = "".join(f'    "{name}/**",\n' for name in top_folders(root))
     text = re.sub(
-        r"^include   = \[\](.*)$",
-        lambda match: f"include   = [ {match.group(1)}\n{lines}]",
+        r"^(include\s*=\s*)\[\](.*)$",
+        lambda match: f"{match.group(1)}[{match.group(2)}\n{lines}]",
         _template(),
         count=1,
         flags=re.MULTILINE,

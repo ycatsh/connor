@@ -1,3 +1,4 @@
+import re
 from importlib.resources import files
 from pathlib import Path
 
@@ -423,3 +424,30 @@ def test_category_values_must_be_text(home: Path) -> None:
     assert problems("[categories]\nInvoices = 3") == [
         "[categories] Invoices: expected text, got 3"
     ]
+
+
+def test_template_examples_are_valid_when_uncommented(home: Path) -> None:
+    template = files("connor.config").joinpath("template.toml").read_text()
+    example = re.compile(r"^# (?=\[\[|[A-Za-z_]+\s+=)")
+    uncommented = "\n".join(example.sub("", line) for line in template.splitlines())
+
+    config = parse_config(uncommented)
+
+    assert [scheme.name for scheme in config.names.schemes] == [
+        "course",
+        "invoices",
+        "lessons",
+    ]
+    assert config.names.schemes[1].style.date_format == "%Y-%m"
+    assert config.names.schemes[2].style.case == "lower"
+    assert len(config.rules) == 1
+    assert [category.name for category in config.categories] == ["Invoices"]
+
+
+def test_template_has_few_comments() -> None:
+    lines = files("connor.config").joinpath("template.toml").read_text().splitlines()
+    prose = [line for line in lines if line.startswith("#") and "=" not in line]
+    trailing = [line for line in lines if not line.startswith("#") and "#" in line]
+
+    assert len(prose) <= 12
+    assert len(trailing) <= 6
