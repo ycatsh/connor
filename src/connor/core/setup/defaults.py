@@ -1,2 +1,0 @@
-MISCELLANEOUS_FOLDER_NAME = "_misc"
-APP_NAME = "connor"

@@ -1,0 +1,56 @@
+# connor config
+# Every key is optional. Run `connor config` to see the values in effect.
+# Paths are relative to [library].root unless they start with / or ~.
+# Globs: * is one folder level, ** is any depth.
+
+[inbox]
+dirs    = ["~"]                       # only loose files at the top are sorted
+min_age = "2m"                        # skip files changed more recently
+ignore  = ["*.part", "*.crdownload", "*.tmp"]
+
+[library]
+root      = "~"
+include   = []                        # folders connor may sort into. empty = all
+exclude   = []                        # removed from include
+max_depth = 8
+# Always skipped, even if included: hidden folders, repos (.git, pyproject.toml,
+# package.json, .venv), vaults (.obsidian), app bundles, build dirs, and folders
+# with a .connorignore file.
+
+[sorting]
+apply       = "high"                  # what --yes and watch apply: high or med
+new_folders = false                   # group leftovers into new folders? always on when
+                                      # the library has no folders yet
+rename      = "scheme"                # off, scheme, or junk (scheme + fix junk names elsewhere)
+dupes       = "skip"                  # skip or move (to <inbox>/_duplicates)
+
+[names]                               # defaults for every scheme
+format      = "{date}_{title}"        # used for junk names outside any scheme
+date_format = "%Y-%m-%d"              # allowed: %Y %m %d %y %b
+date_from   = ["content", "modified"] # where {date} comes from, in order
+title_from  = "name"                  # name: clean the old name. content: doc title or first line
+separator   = "_"                     # replaces spaces inside fields
+case        = "keep"                  # keep, lower or title
+max_length  = 80
+
+# One block per naming scheme. Fields: {date} {title} {folder} {parent} {n} {n:02} {name}
+# [[names.scheme]]
+# name    = "course"
+# folders = ["university/*/*"]
+# format  = "{date}_{folder}_{title}"
+# case    = "lower"                   # any [names] key can be overridden here
+
+# Fixed placement, no guessing. The target must be an allowed folder.
+# [[rules]]
+# match = ["*.deb", "*.AppImage"]
+# to    = "installers"
+
+[categories]                          # for `connor sort --by` with no values
+# Invoices = "invoice bill amount due"
+
+[watch]
+schedule = "0 3 * * *"                # cron: minute hour day month weekday. or @daily, @weekly
+
+[model]
+name       = "minishlab/potion-base-8M"
+read_chars = 2000
