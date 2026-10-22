@@ -55,6 +55,7 @@ def run_sort(
     sources: list[str],
     into: str | None,
     by: str | None,
+    new_folders: str | None,
     yes: bool,
     dry_run: bool,
     edit: bool,
@@ -69,7 +70,14 @@ def run_sort(
     started = time.perf_counter()
     with Index(index_path()) as index:
         sorting = prepare_sort(
-            config, inbox, root, embedder, index, time.time(), labels=labels
+            config,
+            inbox,
+            root,
+            embedder,
+            index,
+            time.time(),
+            labels=labels,
+            group_into=_group_into(new_folders, root),
         )
     seconds = time.perf_counter() - started
     tiers = {"high"} if config.sorting.apply == "high" else ALL_TIERS
@@ -98,6 +106,15 @@ def run_sort(
 
 def _absolute(text: str) -> Path:
     return Path(text).expanduser().absolute()
+
+
+def _group_into(text: str | None, root: Path) -> Path | None:
+    if text is None:
+        return None
+    if not text:
+        return root
+    path = Path(text).expanduser()
+    return path if path.is_absolute() else root / path
 
 
 def _labels(config: Config, by: str | None) -> tuple[Category, ...]:

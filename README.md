@@ -133,7 +133,7 @@ The full commented template is in [src/connor/config/template.toml](src/connor/c
 
 | Command | What it does |
 |---|---|
-| `connor sort [SRC] [--into LIB] [--by LABELS] [--yes] [--dry-run] [--edit]` | File the inbox into your library |
+| `connor sort [SRC] [--into LIB] [--by LABELS] [--new-folders [PARENT]] [--yes] [--dry-run] [--edit]` | File the inbox into your library |
 | `connor undo [RUN]` | Undo the last run, or a given one |
 | `connor log` | Past runs |
 | `connor folders` | Where connor may put files, and which scheme applies |
@@ -155,6 +155,17 @@ connor sort ~/scans --by "invoices, receipts, contracts"
 ```
 
 Connor proposes `Invoices/`, `Receipts/` and `Contracts/` and puts each file in the label that fits it best, using the label's meaning, the file name, and any files already in that folder. Descriptions under `[categories]` in the config make labels sharper, and `--by` with no list uses them.
+
+### New folders
+
+Files that fit no folder stay where they are. To group them instead:
+
+```sh
+connor sort --new-folders               # new folders at the library root
+connor sort --new-folders tmp/sorted    # new folders under tmp/sorted
+```
+
+Similar files become one folder, named after their shared prefix or their most distinctive words. Set `new_folders = true` under `[sorting]` to do this on every run.
 
 ### Running on a schedule
 

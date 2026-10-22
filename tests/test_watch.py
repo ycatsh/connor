@@ -11,7 +11,7 @@ from connor.core.journal import Journal
 from connor.core.watch import run_pass, service, watch
 from connor.cron import Schedule
 from fakes import FakeEmbedder
-from test_sort import CONFIG, make_library
+from test_sort import CONFIG, flat_config, make_library
 
 
 def config_for(root: Path, extra: str = "") -> Config:
@@ -131,8 +131,7 @@ def test_watch_on_a_home_dir_never_touches_hidden_files_or_folders(
     before = {rel: (home / rel).read_text() for rel in hidden}
     config = config_for(home)
     if allow_everything:
-        text = f'[inbox]\ndirs = ["{home}"]\n[library]\nroot = "{home}"\n'
-        config = parse_config(text)
+        config = flat_config(home)
 
     with (
         Index(tmp_path / "index.db") as index,

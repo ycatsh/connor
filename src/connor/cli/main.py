@@ -44,6 +44,13 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="LABELS",
         help='sort into folders named after labels, like "invoices, receipts"',
     )
+    sort.add_argument(
+        "--new-folders",
+        nargs="?",
+        const="",
+        metavar="PARENT",
+        help="group leftovers into new folders, under PARENT if given",
+    )
     sort.add_argument("--yes", action="store_true", help="apply without asking")
     sort.add_argument("--dry-run", action="store_true", help="show the plan only")
     sort.add_argument("--edit", action="store_true", help="open the plan in $EDITOR")
@@ -120,6 +127,7 @@ def _dispatch(ctx: commands.Context, args: argparse.Namespace) -> int:
             args.src,
             args.into,
             args.by,
+            args.new_folders,
             args.yes,
             args.dry_run,
             args.edit,

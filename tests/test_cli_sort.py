@@ -303,3 +303,27 @@ def test_check_never_claims_precision_for_an_empty_tier(
     for line in lines:
         if " 0%   of files" in line:
             assert "right" not in line
+
+
+def test_new_folders_flag_for_one_run(
+    lib: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    for name, text in {
+        "trip_paris.txt": "flight hotel paris itinerary booking",
+        "trip_rome.txt": "flight hotel rome itinerary booking",
+    }.items():
+        (lib / name).write_text(text)
+        os.utime(lib / name, (1_700_000_000, 1_700_000_000))
+
+    assert main(["sort", "--dry-run"]) == 0
+    assert "Trip" not in capsys.readouterr().out
+
+    assert main(["sort", "--new-folders", "--dry-run"]) == 0
+    assert 'new folder "Trip" is not allowed by [library] include' in (
+        capsys.readouterr().out
+    )
+
+    assert main(["sort", "--new-folders", "work/sorted", "--dry-run"]) == 0
+    out = capsys.readouterr().out
+    assert "work/sorted/Trip" in out
+    assert "new folder with 1 similar file" in out

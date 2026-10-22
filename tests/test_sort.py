@@ -1,4 +1,5 @@
 import os
+import re
 import time
 from pathlib import Path
 
@@ -86,6 +87,13 @@ def config(root: Path) -> Config:
 def settings(root: Path, extra: str = "") -> Config:
     text = CONFIG.replace("{root}", str(root)).replace('["lib"]', f'["{root}"]')
     return parse_config(text + extra)
+
+
+def flat_config(lib: Path, extra: str = "") -> Config:
+    path = str(lib)
+    return parse_config(
+        f'[inbox]\ndirs = ["{path}"]\n[library]\nroot = "{path}"\n{extra}'
+    )
 
 
 def run(
@@ -203,10 +211,7 @@ def label_setup(tmp_path: Path, include: str) -> tuple[Config, Path]:
     write(lib / "acme_4471.txt", "invoice 4471 amount due 120 payment")
     write(lib / "cake.txt", "flour sugar butter eggs oven bake")
     write(lib / "Recipes/bread.txt", "flour yeast water salt oven bake")
-    text = (
-        f'[inbox]\ndirs = ["{lib}"]\n\n[library]\nroot = "{lib}"\ninclude = {include}\n'
-    )
-    return parse_config(text), lib
+    return flat_config(lib, f"include = {include}\n"), lib
 
 
 def test_labels_place_files_into_named_folders(tmp_path: Path) -> None:
@@ -253,7 +258,7 @@ def test_a_flat_folder_gets_grouped_into_new_folders(tmp_path: Path) -> None:
     write(lib / "a.jpg", b"\xff\xd8\x01")
     write(lib / "b.jpg", b"\xff\xd8\x02")
     write(lib / "notes.txt", "milk eggs bread")
-    config = parse_config(f'[inbox]\ndirs = ["{lib}"]\n[library]\nroot = "{lib}"\n')
+    config = flat_config(lib)
 
     actions = by_name(run(config, lib, tmp_path))
 
@@ -299,10 +304,7 @@ def test_new_folders_must_be_allowed_by_include(root: Path, tmp_path: Path) -> N
 
 
 def test_edits_cannot_escape_the_library(root: Path, tmp_path: Path) -> None:
-    config = parse_config(
-        f'[inbox]\ndirs = ["{root}"]\n[library]\nroot = "{root}"\n'
-        "[sorting]\nnew_folders = true\n"
-    )
+    config = flat_config(root, "[sorting]\nnew_folders = true\n")
 
     result = run(config, root, tmp_path)
 
@@ -310,3 +312,47 @@ def test_edits_cannot_escape_the_library(root: Path, tmp_path: Path) -> None:
     assert not result.allowed(root / "work/../../outside")
     assert not result.allowed(Path("/etc/connor"))
     assert result.allowed(root / "work/acme/new_folder")
+
+
+def test_new_folders_can_go_under_a_chosen_parent(
+    config: Config, root: Path, tmp_path: Path
+) -> None:
+    add_trips(root)
+
+    with Index(tmp_path / "cache" / "index.db") as index:
+        result = prepare_sort(
+            config,
+            config.inbox.dirs,
+            root,
+            FakeEmbedder(),
+            index,
+            NOW,
+            group_into=root / "work/sorted",
+        )
+
+    trip = by_name(result)["trip_paris.txt"]
+    assert trip.target == root / "work/sorted/Trip/trip_paris.txt"
+    assert trip.tier == "med"
+    assert result.allowed(root / "work/sorted/Trip")
+
+
+@pytest.mark.parametrize(
+    ("parent", "problem"),
+    [("../elsewhere", "inside the library"), ("code/tool", "protected folder (repo)")],
+)
+def test_new_folder_parent_must_be_safe(
+    config: Config, root: Path, tmp_path: Path, parent: str, problem: str
+) -> None:
+    with (
+        Index(tmp_path / "cache" / "index.db") as index,
+        pytest.raises(ConnorError, match=re.escape(problem)),
+    ):
+        prepare_sort(
+            config,
+            config.inbox.dirs,
+            root,
+            FakeEmbedder(),
+            index,
+            NOW,
+            group_into=root / parent,
+        )

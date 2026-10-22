@@ -62,6 +62,7 @@ def prepare_sort(
     index: Index,
     now: float,
     labels: Sequence[Category] = (),
+    group_into: Path | None = None,
 ) -> Sorting:
     """Scan, read and place the inbox, and build the plan.
 
@@ -74,12 +75,15 @@ def prepare_sort(
         now: Current time as a Unix timestamp.
         labels: Sort into folders named after these labels instead of the
             library folders.
+        group_into: Group leftovers into new folders under this folder, even
+            when [sorting] new_folders is off.
 
     Returns:
         The plan and what is needed to review, edit and apply it.
 
     Raises:
-        ConnorError: A label folder is not allowed.
+        ConnorError: A label folder is not allowed, or group_into is outside
+            the library or protected.
     """
     inbox = scan_inbox(tuple(sources), config.inbox.ignore, config.inbox.min_age, now)
     entries = index.entries(inbox.files, embedder, config.model.read_chars)
@@ -108,8 +112,13 @@ def prepare_sort(
     ]
     listing = Listing()
     created: set[Path] = set()
-    if config.sorting.new_folders or (not shelf.folders and not labels):
-        decisions, created = _group(decisions, config, root, listing)
+    parent = group_into
+    if parent is not None:
+        _check_parent(root, parent)
+    elif config.sorting.new_folders or (not shelf.folders and not labels):
+        parent = root
+    if parent is not None:
+        decisions, created = _group(decisions, config, root, parent, listing)
     plan = assemble(decisions, root, config.names, config.sorting.rename, listing)
     return Sorting(
         plan=plan,
@@ -267,17 +276,31 @@ def _rule_for(name: str, rules: Sequence[Rule]) -> tuple[Rule, str] | None:
     return None
 
 
+def _check_parent(root: Path, parent: Path) -> None:
+    if not parent.is_relative_to(root) or ".." in parent.relative_to(root).parts:
+        raise ConnorError(f"--new-folders must point inside the library {root}")
+    reason = protected(root, parent)
+    if reason is not None:
+        rel = parent.relative_to(root).as_posix()
+        raise ConnorError(f"{rel} is a protected folder ({reason})")
+
+
 def _group(
-    decisions: list[Decision], config: Config, root: Path, listing: Listing
+    decisions: list[Decision],
+    config: Config,
+    root: Path,
+    parent: Path,
+    listing: Listing,
 ) -> tuple[list[Decision], set[Path]]:
     leftovers = [d.entry for d in decisions if d.folder is None and d.why == NO_FIT]
     groups = group_leftovers(
-        leftovers, config.names.style.separator, set(listing(root))
+        leftovers, config.names.style.separator, set(listing(parent))
     )
     changed: dict[Path, Decision] = {}
     created: set[Path] = set()
     for group in groups:
-        folder = root / group.name
+        folder = parent / group.name
+        rel = folder.relative_to(root).as_posix()
         problem = _new_folder_problem(config, root, folder)
         others = len(group.entries) - 1
         noun = "file" if others == 1 else "files"
@@ -286,9 +309,7 @@ def _group(
             if problem:
                 changed[entry.path] = Decision(entry, None, "", "stays", 0.0, why)
             else:
-                changed[entry.path] = Decision(
-                    entry, folder, group.name, "med", 0.0, why
-                )
+                changed[entry.path] = Decision(entry, folder, rel, "med", 0.0, why)
         if not problem:
             created.add(folder)
     return [changed.get(d.entry.path, d) for d in decisions], created
