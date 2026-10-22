@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .model-cache
           key: model-potion-base-8M
