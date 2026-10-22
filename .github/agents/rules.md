@@ -18,7 +18,7 @@ This file is for developers who let AI coding agents (Claude Code, Copilot, Code
   - Any commit with a `Co-Authored-By` AI trailer must have the `[AI]` prefix, otherwise CI fails and the merge is blocked.
 
 - **CI checks**
-  - `main` requires the CI job to pass on Linux, macOS and Windows before merging. The following checks must all pass:
+  - `main` requires the CI job to pass on Linux and macOS before merging. The following checks must all pass:
     - `pytest`
     - `ruff check`
     - `ruff format --check`
